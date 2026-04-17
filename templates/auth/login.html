@@ -5,21 +5,38 @@
 {% block content %}
 <div class="auth-wrap">
   <section class="auth-hero">
-    <h1>Welcome back to Jambo Sphere POS</h1>
-    <p>Process sales quickly, track daily totals, and keep product updates flowing in real time with HTMX-driven interactions.</p>
-    <span class="tag">Fast Checkout Experience</span>
+    <span class="tag">Live Store Operations</span>
+    <h1>Run sales like a modern retail desk</h1>
+    <p>Real-time product additions, quick cashier actions, and automatic daily totals in one colorful POS experience.</p>
+
+    <div class="auth-meta">
+      <div class="auth-chip">
+        <strong>2s</strong>
+        Avg. item add flow
+      </div>
+      <div class="auth-chip">
+        <strong>HTMX</strong>
+        No full-page refresh
+      </div>
+    </div>
+
+    <ul class="auth-list">
+      <li><span class="auth-dot"></span>Instant list updates for products and sales</li>
+      <li><span class="auth-dot"></span>Optimized for cashier speed and clarity</li>
+      <li><span class="auth-dot"></span>Daily totals refreshed live</li>
+    </ul>
   </section>
 
   <section class="auth-panel">
     <div class="auth-card">
       <div class="card">
-        <h2>Sign In</h2>
-        <p class="muted">Use your cashier or admin account to continue.</p>
+        <h2>Welcome back</h2>
+        <p class="muted">Login to access the Jambo Sphere POS dashboard.</p>
 
         <form method="post" action="/login/">
           {% csrf_token %}
           <div class="field">
-            <label for="email">Email or Username</label>
+            <label for="email">Work Email or Username</label>
             <input id="email" name="email" type="text" placeholder="you@jambosphere.com" required />
           </div>
 
@@ -28,10 +45,10 @@
             <input id="password" name="password" type="password" placeholder="Enter password" required />
           </div>
 
-          <button class="btn btn-primary" type="submit">Login</button>
+          <button class="btn btn-primary" style="width: 100%; margin-top: 6px;" type="submit">Sign In to Dashboard</button>
         </form>
 
-        <p class="muted">No account yet? <a href="/signup/" style="color: #1f7a4f; font-weight: 700;">Create one</a></p>
+        <p class="muted" style="margin-top: 14px;">No account yet? <a href="/signup/" style="color: #2f67f6; font-weight: 700;">Create one</a></p>
       </div>
     </div>
   </section>

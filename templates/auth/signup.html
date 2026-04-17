@@ -5,16 +5,33 @@
 {% block content %}
 <div class="auth-wrap">
   <section class="auth-hero">
-    <h1>Create your POS account</h1>
-    <p>Set up your profile and start managing products, recording sales, and reviewing daily performance from one dashboard.</p>
-    <span class="tag">Jambo Sphere Starter</span>
+    <span class="tag">Get Started Fast</span>
+    <h1>Launch your POS workspace in minutes</h1>
+    <p>Create an account and start capturing product and sales activity instantly with a modern native Django interface.</p>
+
+    <div class="auth-meta">
+      <div class="auth-chip">
+        <strong>Easy Setup</strong>
+        Ready in under 5 minutes
+      </div>
+      <div class="auth-chip">
+        <strong>Realtime</strong>
+        HTMX partial updates
+      </div>
+    </div>
+
+    <ul class="auth-list">
+      <li><span class="auth-dot"></span>Add products with live table updates</li>
+      <li><span class="auth-dot"></span>Record sales without page reloads</li>
+      <li><span class="auth-dot"></span>Track daily totals from dashboard cards</li>
+    </ul>
   </section>
 
   <section class="auth-panel">
     <div class="auth-card">
       <div class="card">
-        <h2>Sign Up</h2>
-        <p class="muted">Fill the details below to create your account.</p>
+        <h2>Create account</h2>
+        <p class="muted">Set up your cashier profile to continue.</p>
 
         <form method="post" action="/signup/">
           {% csrf_token %}
@@ -38,10 +55,10 @@
             <input id="password2" name="password2" type="password" required />
           </div>
 
-          <button class="btn btn-primary" type="submit">Create Account</button>
+          <button class="btn btn-primary" style="width: 100%; margin-top: 6px;" type="submit">Create Account</button>
         </form>
 
-        <p class="muted">Already registered? <a href="/login/" style="color: #1f7a4f; font-weight: 700;">Sign in</a></p>
+        <p class="muted" style="margin-top: 14px;">Already registered? <a href="/login/" style="color: #2f67f6; font-weight: 700;">Sign in</a></p>
       </div>
     </div>
   </section>
