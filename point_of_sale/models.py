@@ -46,4 +46,35 @@ class SaleItem(models.Model):
     sale = models.ForeignKey(Sale,on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    unit_price = 
+    unit_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        editable=False,
+        help_text="Price at the time of sale (auto-filled)"
+    )
+    
+    subtotal = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0.00,
+        editable=False
+    )
+    
+    def save(self, *args, **kwargs):
+        if not self.unit_price or self.unit_price == 0:
+            self.unit_price = self.product.price # automatically set unit price from the product price
+            
+            #calculate the subtotal
+            self.subtotal = self.unit_price * self.quantity
+            
+            super().save(*args, **kwargs)
+            
+            if self.sale:
+                self.sale.update_total() # update the total amount of the sale whenever a sale item is saved or updated
+                
+    def __str__(self):
+        return f"{self.quantity}x {self.product.name} @ UGX {self.unit_price:,}"
+    
+    
+            
+            
