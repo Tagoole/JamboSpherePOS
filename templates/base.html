@@ -10,19 +10,19 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
     :root {
-      --bg: #f6f8ff;
-      --bg-soft: #ecf0ff;
+      --bg: #f4fffe;
+      --bg-soft: #e8fbf9;
       --surface: #ffffff;
-      --ink: #172034;
-      --ink-soft: #43516d;
-      --brand: #2f67f6;
-      --brand-soft: #dfe8ff;
-      --accent: #ff8b42;
-      --accent-2: #ff5f8f;
+      --ink: #12373a;
+      --ink-soft: #3a6366;
+      --brand: #10b7b0;
+      --brand-soft: #dcf8f6;
+      --accent: #25cfc8;
+      --accent-2: #8cebe7;
       --accent-3: #14b8a6;
       --danger: #c0392b;
-      --border: #d7def0;
-      --shadow: 0 14px 30px rgba(26, 34, 67, 0.1);
+      --border: #cfeeed;
+      --shadow: 0 14px 30px rgba(10, 96, 102, 0.12);
     }
 
     * {
@@ -34,9 +34,9 @@
       margin: 0;
       padding: 0;
       background:
-        radial-gradient(circle at 0% 0%, #ffd7c0 0%, transparent 24%),
-        radial-gradient(circle at 100% 90%, #cfe2ff 0%, transparent 28%),
-        radial-gradient(circle at 70% 25%, #d8fff6 0%, transparent 18%),
+        radial-gradient(circle at 0% 0%, #d4faf7 0%, transparent 24%),
+        radial-gradient(circle at 100% 90%, #c7f4f1 0%, transparent 28%),
+        radial-gradient(circle at 70% 25%, #e8fffd 0%, transparent 18%),
         var(--bg);
       color: var(--ink);
       font-family: "IBM Plex Sans", sans-serif;
@@ -68,8 +68,8 @@
 
     .sidebar {
       background:
-        linear-gradient(164deg, rgba(18, 52, 137, 0.96), rgba(45, 24, 105, 0.96)),
-        linear-gradient(22deg, rgba(255, 101, 78, 0.72), transparent 48%);
+        linear-gradient(164deg, rgba(7, 108, 114, 0.97), rgba(9, 140, 145, 0.95)),
+        linear-gradient(22deg, rgba(140, 235, 231, 0.56), transparent 48%);
       color: #f3f6ff;
       padding: 26px 18px;
       position: sticky;
@@ -85,7 +85,7 @@
       height: 180px;
       right: -70px;
       bottom: -60px;
-      background: radial-gradient(circle, rgba(255, 143, 95, 0.55), transparent 65%);
+      background: radial-gradient(circle, rgba(183, 251, 247, 0.52), transparent 65%);
       pointer-events: none;
     }
 
@@ -100,10 +100,10 @@
       width: 34px;
       height: 34px;
       border-radius: 9px;
-      background: linear-gradient(135deg, #ffd166, #ff5f8f);
+      background: linear-gradient(135deg, #e6fffd, #8cebe7);
       display: grid;
       place-items: center;
-      color: #4d2239;
+      color: #0c5a5f;
       font-weight: 700;
     }
 
@@ -132,7 +132,7 @@
 
     .nav-link.active {
       background: #ffffff;
-      color: #28387a;
+      color: #0d5f64;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     }
 
@@ -179,7 +179,7 @@
     .metric {
       display: grid;
       gap: 8px;
-      background: linear-gradient(160deg, #ffffff, #f6f9ff);
+      background: linear-gradient(160deg, #ffffff, #f3fffe);
     }
 
     .metric small {
@@ -207,17 +207,17 @@
 
     .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(52, 84, 197, 0.24);
+      box-shadow: 0 10px 24px rgba(16, 133, 137, 0.28);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #2f67f6, #14b8a6);
+      background: linear-gradient(135deg, #0da9a2, #27d0c8);
       color: #ffffff;
     }
 
     .btn-secondary {
-      background: #fff2e8;
-      color: #914d1f;
+      background: #e9fbfa;
+      color: #0f686d;
       border: 1px solid var(--border);
     }
 
@@ -235,7 +235,7 @@
 
     .field label {
       font-size: 0.9rem;
-      color: #2e4068;
+      color: #2d6063;
       font-weight: 600;
     }
 
@@ -254,8 +254,8 @@
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
-      border-color: #7091ff;
-      box-shadow: 0 0 0 3px rgba(88, 116, 221, 0.2);
+      border-color: #57c5c0;
+      box-shadow: 0 0 0 3px rgba(62, 194, 186, 0.22);
     }
 
     table {
@@ -272,7 +272,7 @@
     }
 
     th {
-      color: #60729a;
+      color: #4f7477;
       font-size: 0.82rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -284,8 +284,8 @@
       font-size: 0.78rem;
       font-weight: 600;
       display: inline-block;
-      background: #ffe9f2;
-      color: #9b2a56;
+      background: #e5fbf9;
+      color: #0f6f73;
     }
 
     .auth-wrap {
@@ -296,7 +296,7 @@
 
     .auth-hero {
       background:
-        linear-gradient(145deg, rgba(26, 45, 116, 0.86), rgba(170, 52, 87, 0.78)),
+        linear-gradient(145deg, rgba(8, 100, 106, 0.88), rgba(17, 162, 165, 0.8)),
         url("https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1400&q=80") center/cover;
       padding: 46px;
       color: #eefcf3;
@@ -320,7 +320,7 @@
       height: 210px;
       right: -40px;
       top: -40px;
-      background: radial-gradient(circle, rgba(255, 186, 96, 0.8), transparent 70%);
+      background: radial-gradient(circle, rgba(209, 255, 251, 0.78), transparent 70%);
     }
 
     .auth-hero::after {
@@ -328,7 +328,7 @@
       height: 220px;
       left: -60px;
       bottom: -60px;
-      background: radial-gradient(circle, rgba(43, 214, 193, 0.56), transparent 70%);
+      background: radial-gradient(circle, rgba(141, 237, 232, 0.58), transparent 70%);
     }
 
     .auth-panel {
@@ -345,8 +345,8 @@
     .auth-card .card {
       padding: 28px;
       border-radius: 20px;
-      background: linear-gradient(140deg, #ffffff, #f7f8ff);
-      box-shadow: 0 20px 44px rgba(34, 39, 88, 0.14);
+      background: linear-gradient(140deg, #ffffff, #f2fffe);
+      box-shadow: 0 20px 44px rgba(15, 102, 106, 0.14);
     }
 
     .auth-meta {
@@ -360,7 +360,7 @@
     .auth-chip {
       padding: 11px 12px;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.18);
       border: 1px solid rgba(255, 255, 255, 0.32);
       font-size: 0.86rem;
       backdrop-filter: blur(2px);
@@ -370,7 +370,7 @@
       display: block;
       font-size: 1rem;
       font-family: "Space Grotesk", sans-serif;
-      color: #fff5e9;
+      color: #ecfffd;
     }
 
     .auth-list {
@@ -394,8 +394,8 @@
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: linear-gradient(135deg, #ffd166, #ff5f8f);
-      box-shadow: 0 0 0 4px rgba(255, 233, 189, 0.2);
+      background: linear-gradient(135deg, #a7f3ef, #27d0c8);
+      box-shadow: 0 0 0 4px rgba(208, 252, 249, 0.22);
       flex-shrink: 0;
     }
 
