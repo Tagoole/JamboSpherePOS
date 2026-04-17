@@ -1,0 +1,14 @@
+{% for sale in sales %}
+<tr>
+  <td>{{ sale.created_at|date:"H:i" }}</td>
+  <td>{{ sale.product_name }}</td>
+  <td>{{ sale.quantity }}</td>
+  <td>{{ sale.total_amount }}</td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="4">
+    <div class="empty">No sales recorded yet for today.</div>
+  </td>
+</tr>
+{% endfor %}

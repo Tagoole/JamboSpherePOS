@@ -1,0 +1,13 @@
+{% for product in products %}
+<tr>
+  <td>{{ product.name }}</td>
+  <td>{{ product.price }}</td>
+  <td><span class="tag">Active</span></td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="3">
+    <div class="empty">No products yet. Add your first product from the form.</div>
+  </td>
+</tr>
+{% endfor %}

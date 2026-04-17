@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Sales | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link active" href="/sales/">Sales</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/settings/">Settings</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Record Sale</h1>
+        <p>Submit sales quickly and keep totals synchronized in real time.</p>
+      </div>
+    </header>
+
+    <section class="grid grid-2">
+      <article class="card">
+        <h3 style="margin-bottom: 12px;">New Sale</h3>
+        <form
+          method="post"
+          action="/sales/record/"
+          hx-post="/sales/record/"
+          hx-target="#sales-table-body"
+          hx-swap="afterbegin"
+          hx-on::after-request="this.reset(); htmx.trigger(document.body, 'salesChanged');"
+        >
+          {% csrf_token %}
+          <div class="field">
+            <label for="sale_product">Product</label>
+            <select id="sale_product" name="sale_product" required>
+              <option value="">Select product</option>
+              {% for product in products %}
+                <option value="{{ product.id }}">{{ product.name }}</option>
+              {% empty %}
+                <option value="sample-1">Sample Product</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="sale_quantity">Quantity</label>
+            <input id="sale_quantity" name="sale_quantity" type="number" min="1" value="1" required />
+          </div>
+
+          <div class="field">
+            <label for="sale_amount">Total Amount</label>
+            <input id="sale_amount" name="sale_amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+          </div>
+
+          <button class="btn btn-primary" type="submit">Record Sale</button>
+        </form>
+      </article>
+
+      <article class="card" id="daily-sales-summary" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
+        {% include "pos/partials/today_totals.html" %}
+      </article>
+    </section>
+
+    <section class="card" style="margin-top: 16px;">
+      <h3 style="margin-bottom: 12px;">Today Sales Log</h3>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody
+            id="sales-table-body"
+            hx-get="/partials/sales-list/"
+            hx-trigger="load, salesChanged from:body"
+            hx-swap="innerHTML"
+          >
+            {% include "pos/partials/sale_row.html" %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+{% endblock %}

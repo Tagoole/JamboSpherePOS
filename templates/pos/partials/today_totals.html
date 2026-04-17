@@ -1,0 +1,16 @@
+<div class="grid grid-3">
+  <article class="card metric">
+    <small>Total Sales Today</small>
+    <strong>{{ total_sales_today|default:"0.00" }}</strong>
+  </article>
+
+  <article class="card metric">
+    <small>Transactions</small>
+    <strong>{{ transactions_today|default:"0" }}</strong>
+  </article>
+
+  <article class="card metric">
+    <small>Products Added</small>
+    <strong>{{ products_added_today|default:"0" }}</strong>
+  </article>
+</div>

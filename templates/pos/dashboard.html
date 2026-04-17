@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link active" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/settings/">Settings</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Monitor activity and jump into product or sales operations.</p>
+      </div>
+      <div>
+        <a class="btn btn-secondary" href="/products/">Manage Products</a>
+        <a class="btn btn-primary" href="/sales/">Record Sale</a>
+      </div>
+    </header>
+
+    <section
+      class="grid grid-3"
+      id="dashboard-totals"
+      hx-get="/partials/today-totals/"
+      hx-trigger="load, every 20s"
+      hx-swap="innerHTML"
+    >
+      {% include "pos/partials/today_totals.html" %}
+    </section>
+
+    <section class="grid grid-2" style="margin-top: 14px;">
+      <article class="card">
+        <h3 style="margin-bottom: 10px;">Recent Products</h3>
+        <div
+          id="recent-products"
+          hx-get="/partials/products-list/"
+          hx-trigger="load, productsChanged from:body"
+          hx-swap="innerHTML"
+        >
+          <div class="empty">Products added today will appear here.</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3 style="margin-bottom: 10px;">Recent Sales</h3>
+        <div
+          id="recent-sales"
+          hx-get="/partials/sales-list/"
+          hx-trigger="load, salesChanged from:body"
+          hx-swap="innerHTML"
+        >
+          <div class="empty">Sales recorded today will appear here.</div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+{% endblock %}

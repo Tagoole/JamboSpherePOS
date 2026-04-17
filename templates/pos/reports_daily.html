@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Totals | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link active" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/settings/">Settings</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Daily Sales Summary</h1>
+        <p>Track total revenue and transaction count for today.</p>
+      </div>
+      <button
+        class="btn btn-secondary"
+        hx-get="/partials/today-totals/"
+        hx-target="#totals-panel"
+        hx-swap="innerHTML"
+      >
+        Refresh Totals
+      </button>
+    </header>
+
+    <section class="card" id="totals-panel" hx-get="/partials/today-totals/" hx-trigger="load, every 15s" hx-swap="innerHTML">
+      {% include "pos/partials/today_totals.html" %}
+    </section>
+
+    <section class="grid grid-2" style="margin-top: 16px;">
+      <article class="card">
+        <h3 style="margin-bottom: 8px;">Performance Snapshot</h3>
+        <p class="muted">This panel can later include hourly chart blocks, top-selling items, and cashier-level totals.</p>
+      </article>
+      <article class="card">
+        <h3 style="margin-bottom: 8px;">Export</h3>
+        <p class="muted">Link this button to CSV or PDF endpoint when backend reporting is ready.</p>
+        <button class="btn btn-primary" type="button">Export Report</button>
+      </article>
+    </section>
+  </main>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <section class="auth-hero">
+    <h1>Create your POS account</h1>
+    <p>Set up your profile and start managing products, recording sales, and reviewing daily performance from one dashboard.</p>
+    <span class="tag">Jambo Sphere Starter</span>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="card">
+        <h2>Sign Up</h2>
+        <p class="muted">Fill the details below to create your account.</p>
+
+        <form method="post" action="/signup/">
+          {% csrf_token %}
+          <div class="field">
+            <label for="full_name">Full Name</label>
+            <input id="full_name" name="full_name" type="text" placeholder="Cashier Name" required />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@jambosphere.com" required />
+          </div>
+
+          <div class="field">
+            <label for="password1">Password</label>
+            <input id="password1" name="password1" type="password" required />
+          </div>
+
+          <div class="field">
+            <label for="password2">Confirm Password</label>
+            <input id="password2" name="password2" type="password" required />
+          </div>
+
+          <button class="btn btn-primary" type="submit">Create Account</button>
+        </form>
+
+        <p class="muted">Already registered? <a href="/login/" style="color: #1f7a4f; font-weight: 700;">Sign in</a></p>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

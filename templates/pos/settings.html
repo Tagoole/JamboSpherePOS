@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link active" href="/settings/">Settings</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Store Settings</h1>
+        <p>Optional page for profile and store preferences.</p>
+      </div>
+    </header>
+
+    <section class="grid grid-2">
+      <article class="card">
+        <h3 style="margin-bottom: 10px;">Business Info</h3>
+        <form method="post" action="/settings/">
+          {% csrf_token %}
+          <div class="field">
+            <label for="store_name">Store Name</label>
+            <input id="store_name" name="store_name" type="text" placeholder="Jambo Sphere" />
+          </div>
+          <div class="field">
+            <label for="store_phone">Phone</label>
+            <input id="store_phone" name="store_phone" type="text" placeholder="+255..." />
+          </div>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </article>
+
+      <article class="card">
+        <h3 style="margin-bottom: 10px;">Cashier Preferences</h3>
+        <form method="post" action="/settings/preferences/">
+          {% csrf_token %}
+          <div class="field">
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency">
+              <option value="TZS">TZS</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="receipt_footer">Receipt Footer</label>
+            <textarea id="receipt_footer" name="receipt_footer" rows="4" placeholder="Thank you for shopping with us."></textarea>
+          </div>
+          <button class="btn btn-secondary" type="submit">Update Preferences</button>
+        </form>
+      </article>
+    </section>
+  </main>
+</div>
+{% endblock %}
