@@ -34,7 +34,7 @@
           action="/products/add/"
           hx-post="/products/add/"
           hx-target="#product-table-body"
-          hx-swap="afterbegin"
+          hx-swap="innerHTML"
           hx-on::after-request="this.reset(); htmx.trigger(document.body, 'productsChanged');"
         >
           {% csrf_token %}

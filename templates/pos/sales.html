@@ -34,7 +34,7 @@
           action="/sales/record/"
           hx-post="/sales/record/"
           hx-target="#sales-table-body"
-          hx-swap="afterbegin"
+          hx-swap="innerHTML"
           hx-on::after-request="this.reset(); htmx.trigger(document.body, 'salesChanged');"
         >
           {% csrf_token %}

@@ -43,25 +43,48 @@
     <section class="grid grid-2" style="margin-top: 14px;">
       <article class="card">
         <h3 style="margin-bottom: 10px;">Recent Products</h3>
-        <div
-          id="recent-products"
-          hx-get="/partials/products-list/"
-          hx-trigger="load, productsChanged from:body"
-          hx-swap="innerHTML"
-        >
-          <div class="empty">Products added today will appear here.</div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody
+              id="recent-products"
+              hx-get="/partials/products-list/"
+              hx-trigger="load, productsChanged from:body"
+              hx-swap="innerHTML"
+            >
+              {% include "pos/partials/product_row.html" %}
+            </tbody>
+          </table>
         </div>
       </article>
 
       <article class="card">
         <h3 style="margin-bottom: 10px;">Recent Sales</h3>
-        <div
-          id="recent-sales"
-          hx-get="/partials/sales-list/"
-          hx-trigger="load, salesChanged from:body"
-          hx-swap="innerHTML"
-        >
-          <div class="empty">Sales recorded today will appear here.</div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody
+              id="recent-sales"
+              hx-get="/partials/sales-list/"
+              hx-trigger="load, salesChanged from:body"
+              hx-swap="innerHTML"
+            >
+              {% include "pos/partials/sale_row.html" %}
+            </tbody>
+          </table>
         </div>
       </article>
     </section>
