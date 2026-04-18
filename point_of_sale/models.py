@@ -20,7 +20,7 @@ class Product(models.Model):
 class Sale(models.Model):
     sale_date = models.DateTimeField(default=timezone.now)
     total_amount = models.DecimalField(
-        max_digits=12,
+        max_digits=20,
         decimal_places=2,
         default=0.00,
         editable=False
@@ -54,7 +54,7 @@ class SaleItem(models.Model):
     )
     
     subtotal = models.DecimalField(
-        max_digits=12,
+        max_digits=20,
         decimal_places=2,
         default=0.00,
         editable=False

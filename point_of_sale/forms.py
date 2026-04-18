@@ -25,8 +25,8 @@ class SaleItemForm(forms.ModelForm):
 
 class SaleRecordForm(forms.Form):
     product = forms.ModelChoiceField(queryset=Product.objects.all())
-    quantity = forms.IntegerField(min_value=1)
-    total_amount = forms.DecimalField(max_digits=12, decimal_places=2, required=False)
+    quantity = forms.IntegerField(min_value=1, max_value=9999999)
+    total_amount = forms.DecimalField(max_digits=20, decimal_places=2, required=False)
 
 
 class SignUpForm(UserCreationForm):
