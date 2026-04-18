@@ -1,15 +1,15 @@
-const STATIC_CACHE = 'jambopos-static-v2';
-const DYNAMIC_CACHE = 'jambopos-dynamic-v2';
+const STATIC_CACHE = 'jambopos-static-v3';
+const DYNAMIC_CACHE = 'jambopos-dynamic-v3';
 
 const APP_SHELL = [
   '/',
-  '/login/',
-  '/signup/',
   '/dashboard/',
   '/products/',
   '/sales/',
   '/reports/daily/',
 ];
+
+const AUTH_PAGES = ['/login/', '/signup/'];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(
@@ -43,6 +43,12 @@ self.addEventListener('fetch', function (event) {
   }
 
   const requestUrl = new URL(event.request.url);
+
+  // Never cache auth pages; they must always return fresh CSRF tokens.
+  if (requestUrl.origin === self.location.origin && AUTH_PAGES.includes(requestUrl.pathname)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   // Cache-first for app shell routes.
   if (requestUrl.origin === self.location.origin && APP_SHELL.includes(requestUrl.pathname)) {
