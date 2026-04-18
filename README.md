@@ -9,6 +9,35 @@ Simple Point of Sale prototype built with Django.
 - View daily totals
 - Sign up and login pages
 - HTMX-based partial updates for smoother UI interactions
+- Progressive Web App (PWA) support
+- Offline capability for cached pages
+
+## PWA And Offline Capability
+
+This project includes PWA support, which allows users to install the app and access cached screens when internet/server is unavailable.
+
+### Install / Download the PWA
+
+1. Start the Django server.
+2. Open the app in a Chromium-based browser (Chrome/Edge).
+3. In the address bar, click the install icon (or use browser menu -> Install app).
+4. Confirm installation to add it to desktop/start menu.
+
+### Enable Offline Use (Important)
+
+1. While online, open the key pages at least once:
+	- `/dashboard/`
+	- `/products/`
+	- `/sales/`
+	- `/reports/daily/`
+2. This allows the service worker to cache these pages.
+3. After caching, you can still open cached pages when offline or when the dev server is stopped.
+
+### Offline Behavior Notes
+
+- Cached pages can open offline.
+- Actions that require backend/database processing (for example creating a new sale or login validation) still require the server.
+- If old service worker behavior appears, clear site data and re-open the app once while online.
 
 ## Windows Setup (uv)
 
