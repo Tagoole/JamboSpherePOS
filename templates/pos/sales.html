@@ -25,8 +25,8 @@
       </div>
     </header>
 
-    <section class="grid grid-2">
-      <article class="card">
+    <section class="grid grid-2 sales-layout">
+      <article class="card panel-accent-teal">
         <h3 style="margin-bottom: 12px;">New Sale</h3>
         <form
           method="post"
@@ -63,12 +63,12 @@
         </form>
       </article>
 
-      <article class="card" id="daily-sales-summary" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
+      <article class="card panel-accent-blue" id="daily-sales-summary" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
         {% include "pos/partials/today_totals.html" %}
       </article>
     </section>
 
-    <section class="card" style="margin-top: 16px;">
+    <section class="card panel-accent-green" style="margin-top: 24px;">
       <h3 style="margin-bottom: 12px;">Today Sales Log</h3>
       <div style="overflow-x: auto;">
         <table>

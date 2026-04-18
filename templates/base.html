@@ -167,6 +167,12 @@
     .dashboard-panels {
       gap: 24px;
       margin-top: 8px;
+      align-items: stretch;
+    }
+
+    .sales-layout {
+      gap: 24px;
+      align-items: stretch;
     }
 
     .grid-2 {
@@ -175,6 +181,13 @@
 
     .grid-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .totals-grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: stretch;
     }
 
     .card {
@@ -186,10 +199,66 @@
       animation: rise-in 320ms ease;
     }
 
+    .panel-accent-teal {
+      border-top: 4px solid #10b7b0;
+      background: linear-gradient(180deg, #ffffff 0%, #f3fffe 100%);
+    }
+
+    .panel-accent-blue {
+      border-top: 4px solid #3b82f6;
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+    }
+
+    .panel-accent-green {
+      border-top: 4px solid #22c55e;
+      background: linear-gradient(180deg, #ffffff 0%, #f3fff6 100%);
+    }
+
+    .panel-accent-amber {
+      border-top: 4px solid #f59e0b;
+      background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+    }
+
+    .panel-accent-purple {
+      border-top: 4px solid #8b5cf6;
+      background: linear-gradient(180deg, #ffffff 0%, #f8f4ff 100%);
+    }
+
     .metric {
+      position: relative;
+      overflow: hidden;
       display: grid;
       gap: 8px;
-      background: linear-gradient(160deg, #ffffff, #f3fffe);
+      min-height: 118px;
+      background: linear-gradient(160deg, #ffffff, var(--metric-tint, #f3fffe));
+      border-top: 4px solid var(--metric-accent, #10b7b0);
+    }
+
+    .metric::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      top: -24px;
+      width: 88px;
+      height: 88px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(16, 183, 176, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    .metric-total {
+      --metric-accent: #3b82f6;
+      --metric-tint: #f4f8ff;
+    }
+
+    .metric-transactions {
+      --metric-accent: #22c55e;
+      --metric-tint: #f3fff6;
+    }
+
+    .metric-products {
+      --metric-accent: #f59e0b;
+      --metric-tint: #fffaf0;
     }
 
     .metric small {
@@ -202,7 +271,7 @@
     .metric strong {
       font-family: "Space Grotesk", sans-serif;
       font-size: 1.7rem;
-      color: var(--brand);
+      color: var(--metric-accent, var(--brand));
     }
 
     .btn {
@@ -445,6 +514,26 @@
       background: linear-gradient(135deg, #a7f3ef, #27d0c8);
       box-shadow: 0 0 0 4px rgba(208, 252, 249, 0.22);
       flex-shrink: 0;
+    }
+
+    .summary-card {
+      border-top: 4px solid #3b82f6;
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+    }
+
+    .summary-card-alt {
+      border-top: 4px solid #10b7b0;
+      background: linear-gradient(180deg, #ffffff 0%, #f3fffe 100%);
+    }
+
+    .summary-card-warm {
+      border-top: 4px solid #22c55e;
+      background: linear-gradient(180deg, #ffffff 0%, #f3fff6 100%);
+    }
+
+    .summary-card-soft {
+      border-top: 4px solid #f59e0b;
+      background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
     }
 
     .muted {
