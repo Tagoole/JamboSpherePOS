@@ -33,26 +33,32 @@
         <h2>Create account</h2>
         <p class="muted">Set up your cashier profile to continue.</p>
 
+        {% if form.errors %}
+          <div class="empty" style="margin-bottom: 12px; border-color: #f0c8c3; color: #8a3d36; background: #fff4f2; text-align: left;">
+            {{ form.errors }}
+          </div>
+        {% endif %}
+
         <form method="post" action="/signup/">
           {% csrf_token %}
           <div class="field">
-            <label for="full_name">Full Name</label>
-            <input id="full_name" name="full_name" type="text" placeholder="Cashier Name" required />
+            <label for="id_username">Username</label>
+            <input id="id_username" name="username" type="text" placeholder="Choose a username" required />
           </div>
 
           <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="you@jambosphere.com" required />
+            <label for="id_email">Email</label>
+            <input id="id_email" name="email" type="email" placeholder="you@jambosphere.com" required />
           </div>
 
           <div class="field">
-            <label for="password1">Password</label>
-            <input id="password1" name="password1" type="password" required />
+            <label for="id_password1">Password</label>
+            <input id="id_password1" name="password1" type="password" required />
           </div>
 
           <div class="field">
-            <label for="password2">Confirm Password</label>
-            <input id="password2" name="password2" type="password" required />
+            <label for="id_password2">Confirm Password</label>
+            <input id="id_password2" name="password2" type="password" required />
           </div>
 
           <button class="btn btn-primary" style="width: 100%; margin-top: 6px;" type="submit">Create Account</button>

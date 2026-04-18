@@ -1,3 +1,8 @@
+from datetime import datetime
+
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -23,10 +28,30 @@ def _totals_context() -> dict:
 	}
 
 
-def _daily_summary_context() -> dict:
-	today = timezone.localdate()
-	today_sales = Sale.objects.filter(sale_date__date=today).order_by("-sale_date")
-	today_items = SaleItem.objects.filter(sale__sale_date__date=today).select_related("product", "sale")
+def _sales_date_options() -> list:
+	dates = list(Sale.objects.dates("sale_date", "day", order="DESC"))
+	if not dates:
+		dates = [timezone.localdate()]
+	return [{"value": day.isoformat(), "label": day.strftime("%a, %B %d, %Y")} for day in dates]
+
+
+def _selected_report_date(request):
+	raw = request.GET.get("report_date")
+	if raw:
+		try:
+			return datetime.strptime(raw, "%Y-%m-%d").date()
+		except ValueError:
+			pass
+
+	date_options = _sales_date_options()
+	if date_options:
+		return datetime.strptime(date_options[0]["value"], "%Y-%m-%d").date()
+	return timezone.localdate()
+
+
+def _daily_summary_context(report_date) -> dict:
+	today_sales = Sale.objects.filter(sale_date__date=report_date).order_by("-sale_date")
+	today_items = SaleItem.objects.filter(sale__sale_date__date=report_date).select_related("product", "sale")
 
 	total_sales = today_sales.aggregate(total=Sum("total_amount"))["total"] or 0
 	transactions = today_sales.count()
@@ -34,6 +59,11 @@ def _daily_summary_context() -> dict:
 	unique_products = today_items.values("product_id").distinct().count()
 	average_ticket = (total_sales / transactions) if transactions else 0
 	highest_sale = today_sales.order_by("-total_amount").first()
+	products_sold = (
+		today_items.values("product__name")
+		.annotate(total_qty=Sum("quantity"), revenue=Sum("subtotal"))
+		.order_by("-total_qty", "product__name")
+	)
 	top_product = (
 		today_items.values("product__name")
 		.annotate(total_qty=Sum("quantity"))
@@ -41,21 +71,37 @@ def _daily_summary_context() -> dict:
 		.first()
 	)
 
+	products_sold_rows = [
+		{
+			"name": row["product__name"],
+			"qty": row["total_qty"],
+			"revenue": _as_money(row["revenue"] or 0),
+		}
+		for row in products_sold
+	]
+
 	return {
 		"total_sales_today": _as_money(total_sales),
 		"transactions_today": transactions,
-		"products_added_today": Product.objects.filter(created_at__date=today).count(),
+		"products_added_today": Product.objects.filter(created_at__date=report_date).count(),
 		"total_items_sold_today": total_items,
 		"unique_products_sold_today": unique_products,
 		"avg_sale_value_today": _as_money(average_ticket),
 		"highest_sale_today": _as_money(highest_sale.total_amount) if highest_sale else "0.00",
 		"top_product_today": top_product["product__name"] if top_product else "N/A",
-		"recent_sales": _sales_rows(limit=8),
+		"recent_sales": _sales_rows(limit=8, report_date=report_date),
+		"products_sold_rows": products_sold_rows,
+		"selected_report_date": report_date.isoformat(),
+		"selected_report_date_label": report_date.strftime("%a, %B %d, %Y"),
 	}
 
 
-def _sales_rows(limit=None):
-	queryset = SaleItem.objects.select_related("sale", "product").order_by("-sale__sale_date", "-id")
+def _sales_rows(limit=None, report_date=None):
+	queryset = SaleItem.objects.select_related("sale", "product")
+	if report_date:
+		queryset = queryset.filter(sale__sale_date__date=report_date)
+
+	queryset = queryset.order_by("-sale__sale_date", "-id")
 	if limit:
 		queryset = queryset[:limit]
 
@@ -73,23 +119,40 @@ def _sales_rows(limit=None):
 
 @require_http_methods(["GET", "POST"])
 def signup_view(request):
-	if request.method == "POST":
+	if request.user.is_authenticated:
 		return redirect("dashboard")
-	return render(request, "auth/signup.html")
+
+	form = SignUpForm(request.POST or None)
+	if request.method == "POST":
+		if form.is_valid():
+			user = form.save()
+			auth_login(request, user)
+			return redirect("dashboard")
+	return render(request, "auth/signup.html", {"form": form})
 
 
 @require_http_methods(["GET", "POST"])
 def login_view(request):
-	if request.method == "POST":
+	if request.user.is_authenticated:
 		return redirect("dashboard")
-	return render(request, "auth/login.html")
+
+	form = LoginForm(request, data=request.POST or None)
+	if request.method == "POST":
+		if form.is_valid():
+			auth_login(request, form.get_user())
+			next_url = request.POST.get("next") or request.GET.get("next")
+			return redirect(next_url or "dashboard")
+
+	return render(request, "auth/login.html", {"form": form, "next": request.GET.get("next", "")})
 
 
 @require_GET
 def logout_view(request):
+	auth_logout(request)
 	return redirect("login")
 
 
+@login_required(login_url="login")
 @require_GET
 def dashboard_view(request):
 	context = {
@@ -100,12 +163,14 @@ def dashboard_view(request):
 	return render(request, "pos/dashboard.html", context)
 
 
+@login_required(login_url="login")
 @require_GET
 def products_page(request):
 	context = {"products": Product.objects.all()}
 	return render(request, "pos/products.html", context)
 
 
+@login_required(login_url="login")
 @require_GET
 def sales_page(request):
 	context = {
@@ -116,41 +181,55 @@ def sales_page(request):
 	return render(request, "pos/sales.html", context)
 
 
+@login_required(login_url="login")
 @require_GET
 def reports_daily_page(request):
-	return render(request, "pos/reports_daily.html", _daily_summary_context())
+	report_date = _selected_report_date(request)
+	context = {
+		**_daily_summary_context(report_date),
+		"sale_dates": _sales_date_options(),
+	}
+	return render(request, "pos/reports_daily.html", context)
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_products_list(request):
 	return render(request, "pos/partials/product_row.html", {"products": Product.objects.all()})
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_recent_products_list(request):
 	return render(request, "pos/partials/product_row_dashboard.html", {"products": Product.objects.order_by("-created_at")[:5]})
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_sales_list(request):
 	return render(request, "pos/partials/sale_row.html", {"sales": _sales_rows()})
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_recent_sales_list(request):
 	return render(request, "pos/partials/sale_row_dashboard.html", {"sales": _sales_rows(limit=5)})
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_today_totals(request):
 	return render(request, "pos/partials/today_totals.html", _totals_context())
 
 
+@login_required(login_url="login")
 @require_GET
 def partial_daily_summary_details(request):
-	return render(request, "pos/partials/daily_summary_detail.html", _daily_summary_context())
+	report_date = _selected_report_date(request)
+	return render(request, "pos/partials/daily_summary_detail.html", _daily_summary_context(report_date))
 
 
+@login_required(login_url="login")
 @require_POST
 def product_create(request):
 	form_data = request.POST.copy()
@@ -170,6 +249,7 @@ def product_create(request):
 	return redirect("products")
 
 
+@login_required(login_url="login")
 @require_GET
 def product_detail(request, product_id: int):
 	product = get_object_or_404(Product, pk=product_id)
@@ -183,6 +263,7 @@ def product_detail(request, product_id: int):
 	)
 
 
+@login_required(login_url="login")
 @require_http_methods(["GET", "POST"])
 def product_edit_page(request, product_id: int):
 	product = get_object_or_404(Product, pk=product_id)
@@ -203,6 +284,7 @@ def product_edit_page(request, product_id: int):
 	return render(request, "pos/product_edit.html", {"form": form, "product": product})
 
 
+@login_required(login_url="login")
 @require_POST
 def product_update(request, product_id: int):
 	product = get_object_or_404(Product, pk=product_id)
@@ -224,6 +306,7 @@ def product_update(request, product_id: int):
 	return redirect("products")
 
 
+@login_required(login_url="login")
 @require_POST
 def product_delete(request, product_id: int):
 	product = get_object_or_404(Product, pk=product_id)
@@ -234,6 +317,7 @@ def product_delete(request, product_id: int):
 	return redirect("products")
 
 
+@login_required(login_url="login")
 @require_POST
 def sale_create(request):
 	product_id = request.POST.get("sale_product")
@@ -260,6 +344,7 @@ def sale_create(request):
 	return redirect("sales")
 
 
+@login_required(login_url="login")
 @require_GET
 def sale_detail(request, sale_id: int):
 	sale = get_object_or_404(Sale, pk=sale_id)
@@ -282,6 +367,7 @@ def sale_detail(request, sale_id: int):
 	)
 
 
+@login_required(login_url="login")
 @require_POST
 def sale_delete(request, sale_id: int):
 	sale = get_object_or_404(Sale, pk=sale_id)

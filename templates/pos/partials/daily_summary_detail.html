@@ -1,29 +1,77 @@
+<section class="card" style="margin-bottom: 16px;">
+  <h3 style="margin-bottom: 6px;">Summary For {{ selected_report_date_label }}</h3>
+  <p class="muted" style="margin: 0;">All totals and sales activity shown below are based on this selected day.</p>
+</section>
+
 <div class="summary-mini">
   <article class="card">
-    <small>Items Sold Today</small>
+    <small>Total Sales</small>
+    <strong>{{ total_sales_today }}</strong>
+  </article>
+  <article class="card">
+    <small>Transactions</small>
+    <strong>{{ transactions_today }}</strong>
+  </article>
+  <article class="card">
+    <small>Items Sold</small>
     <strong>{{ total_items_sold_today }}</strong>
   </article>
   <article class="card">
-    <small>Unique Products Sold</small>
+    <small>Unique Products</small>
     <strong>{{ unique_products_sold_today }}</strong>
-  </article>
-  <article class="card">
-    <small>Average Sale Value</small>
-    <strong>{{ avg_sale_value_today }}</strong>
-  </article>
-  <article class="card">
-    <small>Highest Sale Today</small>
-    <strong>{{ highest_sale_today }}</strong>
   </article>
 </div>
 
 <section class="card" style="margin-top: 16px;">
-  <h3 style="margin-bottom: 8px;">Top Performance Insight</h3>
-  <p class="muted" style="margin: 0;">Top product today: <strong>{{ top_product_today }}</strong></p>
+  <h3 style="margin-bottom: 8px;">Performance Insights</h3>
+  <div class="grid grid-3">
+    <div>
+      <small class="muted">Average Sale Value</small>
+      <p style="font-weight: 700; margin: 6px 0 0;">{{ avg_sale_value_today }}</p>
+    </div>
+    <div>
+      <small class="muted">Highest Single Sale</small>
+      <p style="font-weight: 700; margin: 6px 0 0;">{{ highest_sale_today }}</p>
+    </div>
+    <div>
+      <small class="muted">Top Product</small>
+      <p style="font-weight: 700; margin: 6px 0 0;">{{ top_product_today }}</p>
+    </div>
+  </div>
 </section>
 
 <section class="card" style="margin-top: 16px;">
-  <h3 style="margin-bottom: 12px;">Recent Sales Activity</h3>
+  <h3 style="margin-bottom: 12px;">Products Sold On This Date</h3>
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity Sold</th>
+          <th>Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in products_sold_rows %}
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>{{ row.qty }}</td>
+          <td>{{ row.revenue }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">
+            <div class="empty">No products were sold on this date.</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card" style="margin-top: 16px;">
+  <h3 style="margin-bottom: 12px;">Sales Activity On This Date</h3>
   <div style="overflow-x: auto;">
     <table>
       <thead>
@@ -45,7 +93,7 @@
         {% empty %}
         <tr>
           <td colspan="4">
-            <div class="empty">No sales recorded yet for today.</div>
+            <div class="empty">No sales recorded for this date.</div>
           </td>
         </tr>
         {% endfor %}

@@ -33,16 +33,23 @@
         <h2>Welcome back</h2>
         <p class="muted">Login to access the Jambo Sphere POS dashboard.</p>
 
+        {% if form.non_field_errors %}
+          <div class="empty" style="margin-bottom: 12px; border-color: #f0c8c3; color: #8a3d36; background: #fff4f2; text-align: left;">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
         <form method="post" action="/login/">
           {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}" />
           <div class="field">
-            <label for="email">Work Email or Username</label>
-            <input id="email" name="email" type="text" placeholder="you@jambosphere.com" required />
+            <label for="id_username">Username</label>
+            <input id="id_username" name="username" type="text" placeholder="Enter your username" required />
           </div>
 
           <div class="field">
-            <label for="password">Password</label>
-            <input id="password" name="password" type="password" placeholder="Enter password" required />
+            <label for="id_password">Password</label>
+            <input id="id_password" name="password" type="password" placeholder="Enter password" required />
           </div>
 
           <button class="btn btn-primary" style="width: 100%; margin-top: 6px;" type="submit">Sign In to Dashboard</button>

@@ -21,28 +21,33 @@
     <header class="page-header">
       <div>
         <h1>Daily Sales Summary</h1>
-        <p>Track total revenue and transaction count for today.</p>
+        <p>Track revenue and sold products by selected sales date.</p>
       </div>
-      <button
-        class="btn btn-secondary"
-        hx-get="/partials/today-totals/"
-        hx-target="#totals-panel"
-        hx-swap="innerHTML"
-      >
-        Refresh Totals
-      </button>
+      <div class="field" style="min-width: 280px; margin-bottom: 0;">
+        <label for="report-date-select">Filter By Sales Date</label>
+        <select
+          id="report-date-select"
+          name="report_date"
+          hx-get="/partials/daily-summary-details/"
+          hx-target="#daily-details-panel"
+          hx-swap="innerHTML"
+        >
+          {% for date_opt in sale_dates %}
+            <option value="{{ date_opt.value }}" {% if date_opt.value == selected_report_date %}selected{% endif %}>
+              {{ date_opt.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
     </header>
-
-    <section class="card" id="totals-panel" hx-get="/partials/today-totals/" hx-trigger="load, every 15s" hx-swap="innerHTML">
-      {% include "pos/partials/today_totals.html" %}
-    </section>
 
     <section
       id="daily-details-panel"
       hx-get="/partials/daily-summary-details/"
-      hx-trigger="load, every 15s"
+      hx-trigger="every 15s"
+      hx-include="#report-date-select"
       hx-swap="innerHTML"
-      style="margin-top: 16px;"
+      style="margin-top: 4px;"
     >
       {% include "pos/partials/daily_summary_detail.html" %}
     </section>
