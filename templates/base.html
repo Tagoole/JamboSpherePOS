@@ -175,6 +175,24 @@
       align-items: stretch;
     }
 
+    .sales-shell {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .sales-form-sidebar {
+      position: sticky;
+      top: 20px;
+    }
+
+    .sales-content {
+      display: grid;
+      gap: 24px;
+      min-width: 0;
+    }
+
     .grid-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -270,7 +288,9 @@
 
     .metric strong {
       font-family: "Space Grotesk", sans-serif;
-      font-size: 1.7rem;
+      font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+      line-height: 1.1;
+      overflow-wrap: anywhere;
       color: var(--metric-accent, var(--brand));
     }
 
@@ -592,6 +612,14 @@
       .grid-2,
       .grid-3 {
         grid-template-columns: 1fr;
+      }
+
+      .sales-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sales-form-sidebar {
+        position: static;
       }
 
       .summary-mini {

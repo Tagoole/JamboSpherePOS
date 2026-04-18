@@ -21,12 +21,12 @@
     <header class="page-header">
       <div>
         <h1>Record Sale</h1>
-        <p>Submit sales quickly and keep totals synchronized in real time.</p>
+        <p>Use the sale form sidebar and let totals auto-calculate from product price and quantity.</p>
       </div>
     </header>
 
-    <section class="grid grid-2 sales-layout">
-      <article class="card panel-accent-teal">
+    <section class="sales-shell">
+      <aside class="card panel-accent-teal sales-form-sidebar">
         <h3 style="margin-bottom: 12px;">New Sale</h3>
         <form
           method="post"
@@ -34,7 +34,7 @@
           hx-post="/sales/record/"
           hx-target="#sales-table-body"
           hx-swap="innerHTML"
-          hx-on::after-request="this.reset(); htmx.trigger(document.body, 'salesChanged');"
+          hx-on::after-request="this.reset(); if (window.updateSaleTotal) { window.updateSaleTotal(); } htmx.trigger(document.body, 'salesChanged');"
         >
           {% csrf_token %}
           <div class="field">
@@ -42,7 +42,7 @@
             <select id="sale_product" name="sale_product" required>
               <option value="">Select product</option>
               {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }}</option>
+                <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }}</option>
               {% empty %}
                 <option value="sample-1">Sample Product</option>
               {% endfor %}
@@ -55,43 +55,79 @@
           </div>
 
           <div class="field">
-            <label for="sale_amount">Total Amount</label>
-            <input id="sale_amount" name="sale_amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+            <label for="sale_amount">Total Amount (Auto)</label>
+            <input id="sale_amount" name="sale_amount" type="number" step="0.01" min="0" placeholder="0.00" readonly required />
           </div>
 
           <button class="btn btn-primary" type="submit">Record Sale</button>
         </form>
-      </article>
 
-      <article class="card panel-accent-blue" id="daily-sales-summary" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
-        {% include "pos/partials/today_totals.html" %}
-      </article>
-    </section>
+      </aside>
 
-    <section class="card panel-accent-green" style="margin-top: 24px;">
-      <h3 style="margin-bottom: 12px;">Today Sales Log</h3>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Item</th>
-              <th>Qty</th>
-              <th>Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody
-            id="sales-table-body"
-            hx-get="/partials/sales-list/"
-            hx-trigger="load, salesChanged from:body"
-            hx-swap="innerHTML"
-          >
-            {% include "pos/partials/sale_row.html" %}
-          </tbody>
-        </table>
+      <div class="sales-content">
+        <article class="card panel-accent-blue" id="daily-sales-summary" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
+          {% include "pos/partials/today_totals.html" %}
+        </article>
+
+        <section class="card panel-accent-green">
+          <h3 style="margin-bottom: 12px;">Today Sales Log</h3>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody
+                id="sales-table-body"
+                hx-get="/partials/sales-list/"
+                hx-trigger="load, salesChanged from:body"
+                hx-swap="innerHTML"
+              >
+                {% include "pos/partials/sale_row.html" %}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </section>
   </main>
 </div>
+
+<script>
+  (function () {
+    function updateSaleTotal() {
+      const productSelect = document.getElementById("sale_product");
+      const quantityInput = document.getElementById("sale_quantity");
+      const amountInput = document.getElementById("sale_amount");
+
+      if (!productSelect || !quantityInput || !amountInput) {
+        return;
+      }
+
+      const selected = productSelect.options[productSelect.selectedIndex];
+      const price = selected ? parseFloat(selected.getAttribute("data-price") || "0") : 0;
+      const quantity = parseInt(quantityInput.value || "0", 10);
+      const total = (Number.isFinite(price) ? price : 0) * (Number.isFinite(quantity) ? quantity : 0);
+      amountInput.value = total > 0 ? total.toFixed(2) : "";
+    }
+
+    window.updateSaleTotal = updateSaleTotal;
+    document.addEventListener("DOMContentLoaded", updateSaleTotal);
+    document.addEventListener("change", function (event) {
+      if (event.target && event.target.id === "sale_product") {
+        updateSaleTotal();
+      }
+    });
+    document.addEventListener("input", function (event) {
+      if (event.target && event.target.id === "sale_quantity") {
+        updateSaleTotal();
+      }
+    });
+  })();
+</script>
 {% endblock %}
