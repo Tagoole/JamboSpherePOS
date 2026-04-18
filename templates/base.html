@@ -1,12 +1,12 @@
 {% load static %}
+{% load pwa %}
 <!DOCTYPE html>
 <html lang="en">
-{% load pwa %}
-{% progressive_web_app_meta %}
-<link rel="manifest" href="manifest.json">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% progressive_web_app_meta %}
+  <link rel="manifest" href="/manifest.json" />
   <title>{% block title %}Jambo Sphere POS{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
