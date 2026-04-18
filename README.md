@@ -86,6 +86,9 @@ python manage.py migrate
 ```powershell
 python manage.py createsuperuser
 ```
+or use the following credentials 
+username : hostra
+password : 123456789
 
 ### 6. Start development server
 
