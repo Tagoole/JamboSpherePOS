@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "point_of_sale"
+    "point_of_sale",
+    "pwa"
 ]
 
 MIDDLEWARE = [
