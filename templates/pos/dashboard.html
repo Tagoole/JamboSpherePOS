@@ -30,7 +30,7 @@
     </header>
 
     <section
-      class="grid grid-3"
+      class="grid grid-3 dashboard-metrics"
       id="dashboard-totals"
       hx-get="/partials/today-totals/"
       hx-trigger="load, every 20s"
@@ -39,7 +39,7 @@
       {% include "pos/partials/today_totals.html" %}
     </section>
 
-    <section class="grid grid-2" style="margin-top: 14px;">
+    <section class="grid grid-2 dashboard-panels">
       <article class="card">
         <h3 style="margin-bottom: 10px;">Recent Products</h3>
         <div style="overflow-x: auto;">
@@ -53,11 +53,11 @@
             </thead>
             <tbody
               id="recent-products"
-              hx-get="/partials/products-list/"
+              hx-get="/partials/recent-products-list/"
               hx-trigger="load, productsChanged from:body"
               hx-swap="innerHTML"
             >
-              {% include "pos/partials/product_row.html" %}
+              {% include "pos/partials/product_row_dashboard.html" %}
             </tbody>
           </table>
         </div>
@@ -77,11 +77,11 @@
             </thead>
             <tbody
               id="recent-sales"
-              hx-get="/partials/sales-list/"
+              hx-get="/partials/recent-sales-list/"
               hx-trigger="load, salesChanged from:body"
               hx-swap="innerHTML"
             >
-              {% include "pos/partials/sale_row.html" %}
+              {% include "pos/partials/sale_row_dashboard.html" %}
             </tbody>
           </table>
         </div>

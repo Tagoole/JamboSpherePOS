@@ -3,10 +3,27 @@
   <td>{{ product.name }}</td>
   <td>{{ product.price }}</td>
   <td><span class="tag">Active</span></td>
+  <td>
+    <div class="actions">
+      <a class="btn-link" href="/products/{{ product.id }}/edit/">Edit</a>
+      <form
+        method="post"
+        action="/products/{{ product.id }}/delete/"
+        hx-post="/products/{{ product.id }}/delete/"
+        hx-target="#product-table-body"
+        hx-swap="innerHTML"
+        hx-confirm="Delete {{ product.name }}?"
+        hx-on::after-request="htmx.trigger(document.body, 'productsChanged');"
+      >
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </td>
 </tr>
 {% empty %}
 <tr>
-  <td colspan="3">
+  <td colspan="4">
     <div class="empty">No products yet. Add your first product from the form.</div>
   </td>
 </tr>

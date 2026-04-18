@@ -25,37 +25,29 @@
       </div>
     </header>
 
-    <section class="grid grid-2">
-      <article class="card">
-        <h3 style="margin-bottom: 12px;">Add Product</h3>
-        <form
-          method="post"
-          action="/products/add/"
-          hx-post="/products/add/"
-          hx-target="#product-table-body"
-          hx-swap="innerHTML"
-          hx-on::after-request="this.reset(); htmx.trigger(document.body, 'productsChanged');"
-        >
-          {% csrf_token %}
-          <div class="field">
-            <label for="product_name">Product Name</label>
-            <input id="product_name" name="product_name" type="text" placeholder="Example: Soda 500ml" required />
-          </div>
+    <section class="card">
+      <h3 style="margin-bottom: 12px;">Add Product</h3>
+      <form
+        method="post"
+        action="/products/add/"
+        hx-post="/products/add/"
+        hx-target="#product-table-body"
+        hx-swap="innerHTML"
+        hx-on::after-request="this.reset(); htmx.trigger(document.body, 'productsChanged');"
+      >
+        {% csrf_token %}
+        <div class="field">
+          <label for="product_name">Product Name</label>
+          <input id="product_name" name="product_name" type="text" placeholder="Example: Soda 500ml" required />
+        </div>
 
-          <div class="field">
-            <label for="product_price">Unit Price</label>
-            <input id="product_price" name="product_price" type="number" step="0.01" min="0" placeholder="0.00" required />
-          </div>
+        <div class="field">
+          <label for="product_price">Unit Price</label>
+          <input id="product_price" name="product_price" type="number" step="0.01" min="0" placeholder="0.00" required />
+        </div>
 
-          <button class="btn btn-primary" type="submit">Add Product</button>
-        </form>
-      </article>
-
-      <article class="card">
-        <h3 style="margin-bottom: 12px;">Quick Tips</h3>
-        <p class="muted">Use consistent naming and pricing formats. The product list updates instantly after each addition via HTMX.</p>
-        <div class="tag">No full-page refresh</div>
-      </article>
+        <button class="btn btn-primary" type="submit">Add Product</button>
+      </form>
     </section>
 
     <section class="card" style="margin-top: 16px;">
@@ -67,6 +59,7 @@
               <th>Product</th>
               <th>Price</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody

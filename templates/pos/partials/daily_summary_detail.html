@@ -1,0 +1,55 @@
+<div class="summary-mini">
+  <article class="card">
+    <small>Items Sold Today</small>
+    <strong>{{ total_items_sold_today }}</strong>
+  </article>
+  <article class="card">
+    <small>Unique Products Sold</small>
+    <strong>{{ unique_products_sold_today }}</strong>
+  </article>
+  <article class="card">
+    <small>Average Sale Value</small>
+    <strong>{{ avg_sale_value_today }}</strong>
+  </article>
+  <article class="card">
+    <small>Highest Sale Today</small>
+    <strong>{{ highest_sale_today }}</strong>
+  </article>
+</div>
+
+<section class="card" style="margin-top: 16px;">
+  <h3 style="margin-bottom: 8px;">Top Performance Insight</h3>
+  <p class="muted" style="margin: 0;">Top product today: <strong>{{ top_product_today }}</strong></p>
+</section>
+
+<section class="card" style="margin-top: 16px;">
+  <h3 style="margin-bottom: 12px;">Recent Sales Activity</h3>
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sale in recent_sales %}
+        <tr>
+          <td>{{ sale.created_at_display }}</td>
+          <td>{{ sale.product_name }}</td>
+          <td>{{ sale.quantity }}</td>
+          <td>{{ sale.total_amount }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">
+            <div class="empty">No sales recorded yet for today.</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>

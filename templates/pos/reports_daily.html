@@ -37,16 +37,14 @@
       {% include "pos/partials/today_totals.html" %}
     </section>
 
-    <section class="grid grid-2" style="margin-top: 16px;">
-      <article class="card">
-        <h3 style="margin-bottom: 8px;">Performance Snapshot</h3>
-        <p class="muted">This panel can later include hourly chart blocks, top-selling items, and cashier-level totals.</p>
-      </article>
-      <article class="card">
-        <h3 style="margin-bottom: 8px;">Export</h3>
-        <p class="muted">Link this button to CSV or PDF endpoint when backend reporting is ready.</p>
-        <button class="btn btn-primary" type="button">Export Report</button>
-      </article>
+    <section
+      id="daily-details-panel"
+      hx-get="/partials/daily-summary-details/"
+      hx-trigger="load, every 15s"
+      hx-swap="innerHTML"
+      style="margin-top: 16px;"
+    >
+      {% include "pos/partials/daily_summary_detail.html" %}
     </section>
   </main>
 </div>

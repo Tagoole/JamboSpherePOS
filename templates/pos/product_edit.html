@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link active" href="/products/">Products</a>
+    <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Edit Product</h1>
+        <p>Update name and price details for this product.</p>
+      </div>
+      <a class="btn btn-secondary" href="/products/">Back to Products</a>
+    </header>
+
+    <section class="card" style="max-width: 620px;">
+      <form method="post" action="/products/{{ product.id }}/edit/">
+        {% csrf_token %}
+        <div class="field">
+          <label for="id_name">Product Name</label>
+          <input id="id_name" name="name" type="text" value="{{ form.instance.name }}" required />
+        </div>
+
+        <div class="field">
+          <label for="id_price">Unit Price</label>
+          <input id="id_price" name="price" type="number" step="0.01" min="0" value="{{ form.instance.price }}" required />
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Save Changes</button>
+          <a class="btn btn-secondary" href="/products/">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>
+{% endblock %}

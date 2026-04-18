@@ -4,10 +4,24 @@
   <td>{{ sale.product_name }}</td>
   <td>{{ sale.quantity }}</td>
   <td>{{ sale.total_amount }}</td>
+  <td>
+    <form
+      method="post"
+      action="/sales/{{ sale.id }}/delete/"
+      hx-post="/sales/{{ sale.id }}/delete/"
+      hx-target="#sales-table-body"
+      hx-swap="innerHTML"
+      hx-confirm="Delete this sale record?"
+      hx-on::after-request="htmx.trigger(document.body, 'salesChanged');"
+    >
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </td>
 </tr>
 {% empty %}
 <tr>
-  <td colspan="4">
+  <td colspan="5">
     <div class="empty">No sales recorded yet for today.</div>
   </td>
 </tr>

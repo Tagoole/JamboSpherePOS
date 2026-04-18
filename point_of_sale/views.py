@@ -23,6 +23,37 @@ def _totals_context() -> dict:
 	}
 
 
+def _daily_summary_context() -> dict:
+	today = timezone.localdate()
+	today_sales = Sale.objects.filter(sale_date__date=today).order_by("-sale_date")
+	today_items = SaleItem.objects.filter(sale__sale_date__date=today).select_related("product", "sale")
+
+	total_sales = today_sales.aggregate(total=Sum("total_amount"))["total"] or 0
+	transactions = today_sales.count()
+	total_items = today_items.aggregate(total=Sum("quantity"))["total"] or 0
+	unique_products = today_items.values("product_id").distinct().count()
+	average_ticket = (total_sales / transactions) if transactions else 0
+	highest_sale = today_sales.order_by("-total_amount").first()
+	top_product = (
+		today_items.values("product__name")
+		.annotate(total_qty=Sum("quantity"))
+		.order_by("-total_qty")
+		.first()
+	)
+
+	return {
+		"total_sales_today": _as_money(total_sales),
+		"transactions_today": transactions,
+		"products_added_today": Product.objects.filter(created_at__date=today).count(),
+		"total_items_sold_today": total_items,
+		"unique_products_sold_today": unique_products,
+		"avg_sale_value_today": _as_money(average_ticket),
+		"highest_sale_today": _as_money(highest_sale.total_amount) if highest_sale else "0.00",
+		"top_product_today": top_product["product__name"] if top_product else "N/A",
+		"recent_sales": _sales_rows(limit=8),
+	}
+
+
 def _sales_rows(limit=None):
 	queryset = SaleItem.objects.select_related("sale", "product").order_by("-sale__sale_date", "-id")
 	if limit:
@@ -87,7 +118,7 @@ def sales_page(request):
 
 @require_GET
 def reports_daily_page(request):
-	return render(request, "pos/reports_daily.html", _totals_context())
+	return render(request, "pos/reports_daily.html", _daily_summary_context())
 
 
 @require_GET
@@ -96,13 +127,28 @@ def partial_products_list(request):
 
 
 @require_GET
+def partial_recent_products_list(request):
+	return render(request, "pos/partials/product_row_dashboard.html", {"products": Product.objects.order_by("-created_at")[:5]})
+
+
+@require_GET
 def partial_sales_list(request):
 	return render(request, "pos/partials/sale_row.html", {"sales": _sales_rows()})
 
 
 @require_GET
+def partial_recent_sales_list(request):
+	return render(request, "pos/partials/sale_row_dashboard.html", {"sales": _sales_rows(limit=5)})
+
+
+@require_GET
 def partial_today_totals(request):
 	return render(request, "pos/partials/today_totals.html", _totals_context())
+
+
+@require_GET
+def partial_daily_summary_details(request):
+	return render(request, "pos/partials/daily_summary_detail.html", _daily_summary_context())
 
 
 @require_POST
@@ -135,6 +181,26 @@ def product_detail(request, product_id: int):
 			"created_at": timezone.localtime(product.created_at).isoformat(),
 		}
 	)
+
+
+@require_http_methods(["GET", "POST"])
+def product_edit_page(request, product_id: int):
+	product = get_object_or_404(Product, pk=product_id)
+	if request.method == "POST":
+		form_data = request.POST.copy()
+		if "product_name" in form_data:
+			form_data["name"] = form_data.get("product_name")
+		if "product_price" in form_data:
+			form_data["price"] = form_data.get("product_price")
+
+		form = ProductForm(form_data, instance=product)
+		if form.is_valid():
+			form.save()
+			return redirect("products")
+	else:
+		form = ProductForm(instance=product)
+
+	return render(request, "pos/product_edit.html", {"form": form, "product": product})
 
 
 @require_POST
@@ -214,38 +280,6 @@ def sale_detail(request, sale_id: int):
 			"items": items,
 		}
 	)
-
-
-@require_POST
-def sale_update(request, sale_id: int):
-	sale = get_object_or_404(Sale, pk=sale_id)
-	item = sale.items.select_related("product").first()
-	if not item:
-		return JsonResponse({"error": "Sale item not found"}, status=404)
-
-	product_id = request.POST.get("sale_product") or item.product_id
-	quantity = request.POST.get("sale_quantity") or item.quantity
-
-	form = SaleRecordForm(
-		{
-			"product": product_id,
-			"quantity": quantity,
-			"total_amount": request.POST.get("sale_amount") or None,
-		}
-	)
-	if not form.is_valid():
-		return HttpResponseBadRequest("Invalid sale update data.")
-
-	item.product = form.cleaned_data["product"]
-	item.quantity = form.cleaned_data["quantity"]
-	item.unit_price = item.product.price
-	item.subtotal = item.unit_price * item.quantity
-	item.save()
-	sale.update_total()
-
-	if request.headers.get("HX-Request") == "true":
-		return render(request, "pos/partials/sale_row.html", {"sales": _sales_rows()})
-	return redirect("sales")
 
 
 @require_POST
