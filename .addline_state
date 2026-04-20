@@ -1,0 +1,12 @@
+.DS_Store
+.gitignore
+README.md
+jambo_sphere_pos.docx
+static/js/offline-sync.js
+static/js/serviceworker.js
+templates/base.html
+templates/pos/partials/product_row.html
+templates/pos/partials/sale_row.html
+templates/pos/product_edit.html
+templates/pos/products.html
+templates/pos/sales.html
