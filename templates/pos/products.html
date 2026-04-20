@@ -30,6 +30,8 @@
       <form
         method="post"
         action="/products/add/"
+        data-offline-queue="true"
+        data-offline-success-event="productsChanged"
         hx-post="/products/add/"
         hx-target="#product-table-body"
         hx-swap="innerHTML"
