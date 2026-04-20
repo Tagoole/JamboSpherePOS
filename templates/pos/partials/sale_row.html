@@ -8,6 +8,8 @@
     <form
       method="post"
       action="/sales/{{ sale.id }}/delete/"
+      data-offline-queue="true"
+      data-offline-success-event="salesChanged"
       hx-post="/sales/{{ sale.id }}/delete/"
       hx-target="#sales-table-body"
       hx-swap="innerHTML"
