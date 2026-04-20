@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'jambopos-static-v3';
-const DYNAMIC_CACHE = 'jambopos-dynamic-v3';
+const STATIC_CACHE = 'jambopos-static-v4';
+const DYNAMIC_CACHE = 'jambopos-dynamic-v4';
 
 const APP_SHELL = [
   '/',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   '/products/',
   '/sales/',
   '/reports/daily/',
+  '/static/js/offline-sync.js',
 ];
 
 const AUTH_PAGES = ['/login/', '/signup/'];
@@ -100,4 +101,18 @@ self.addEventListener('fetch', function (event) {
         })
     );
   }
+});
+
+self.addEventListener('sync', function (event) {
+  if (event.tag !== 'jambopos-sync') {
+    return;
+  }
+
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(function (clients) {
+      clients.forEach(function (client) {
+        client.postMessage({ type: 'JAMBOPOS_SYNC_REQUESTED' });
+      });
+    })
+  );
 });
