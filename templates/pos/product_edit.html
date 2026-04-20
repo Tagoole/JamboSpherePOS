@@ -27,7 +27,7 @@
     </header>
 
     <section class="card" style="max-width: 620px;">
-      <form method="post" action="/products/{{ product.id }}/edit/">
+      <form method="post" action="/products/{{ product.id }}/edit/" data-offline-queue="true" data-offline-success-event="productsChanged">
         {% csrf_token %}
         <div class="field">
           <label for="id_name">Product Name</label>
