@@ -574,6 +574,43 @@
       background: #f8fcf9;
     }
 
+    .tag-pending {
+      background: #fff4db;
+      color: #8a620d;
+    }
+
+    .sync-status {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1200;
+      background: #0f686d;
+      color: #ecfefe;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 22px rgba(7, 74, 77, 0.34);
+      max-width: min(420px, calc(100vw - 24px));
+    }
+
+    .sync-status p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .sync-status button {
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: #d7fbf9;
+      color: #0f686d;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
     @keyframes rise-in {
       from {
         transform: translateY(7px);
@@ -639,5 +676,10 @@
 </head>
 <body>
   {% block content %}{% endblock %}
+  <div id="sync-status-banner" class="sync-status" role="status" aria-live="polite">
+    <p id="sync-status-text"></p>
+    <button id="sync-now-btn" type="button">Sync now</button>
+  </div>
+  <script src="{% static 'js/offline-sync.js' %}"></script>
 </body>
 </html>
