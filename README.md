@@ -36,7 +36,10 @@ This project includes PWA support, which allows users to install the app and acc
 ### Offline Behavior Notes
 
 - Cached pages can open offline.
-- Actions that require backend/database processing (for example creating a new sale or login validation) still require the server.
+- Product and sale write actions are now queued while offline, then synced automatically when connection/server returns.
+- A sync status banner appears at the bottom-right and shows queued action count.
+- Product/Sale create and delete actions show optimistic pending state while waiting for sync.
+- Auth actions (login/signup) are not queued and still require server access.
 - If old service worker behavior appears, clear site data and re-open the app once while online.
 
 ## Windows Setup (uv)
