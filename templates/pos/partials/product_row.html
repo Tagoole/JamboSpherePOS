@@ -9,6 +9,8 @@
       <form
         method="post"
         action="/products/{{ product.id }}/delete/"
+        data-offline-queue="true"
+        data-offline-success-event="productsChanged"
         hx-post="/products/{{ product.id }}/delete/"
         hx-target="#product-table-body"
         hx-swap="innerHTML"
