@@ -3,9 +3,10 @@ from datetime import datetime
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -93,6 +94,63 @@ def _daily_summary_context(report_date) -> dict:
 		"products_sold_rows": products_sold_rows,
 		"selected_report_date": report_date.isoformat(),
 		"selected_report_date_label": report_date.strftime("%a, %B %d, %Y"),
+	}
+
+
+def _analytics_context() -> dict:
+	rows = list(
+		Sale.objects.annotate(day=TruncDate("sale_date"))
+		.values("day")
+		.annotate(total=Sum("total_amount"), transactions=Count("id"))
+		.order_by("day")
+	)
+
+	daily_labels = [row["day"].strftime("%d %b") for row in rows]
+	daily_totals = [float(row["total"] or 0) for row in rows]
+	daily_transactions = [int(row["transactions"] or 0) for row in rows]
+
+	weekday_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+	weekday_totals = [0.0] * 7
+	for row in rows:
+		weekday_totals[row["day"].weekday()] += float(row["total"] or 0)
+
+	weekly_totals = {}
+	for row in rows:
+		year, week, _ = row["day"].isocalendar()
+		key = f"{year}-W{int(week):02d}"
+		weekly_totals[key] = weekly_totals.get(key, 0.0) + float(row["total"] or 0)
+
+	weekly_items = list(weekly_totals.items())[-10:]
+	weekly_labels = [item[0] for item in weekly_items]
+	weekly_values = [round(item[1], 2) for item in weekly_items]
+
+	product_rows = (
+		SaleItem.objects.values("product__name")
+		.annotate(qty=Sum("quantity"), revenue=Sum("subtotal"))
+		.order_by("-qty", "product__name")[:8]
+	)
+	product_labels = [row["product__name"] for row in product_rows]
+	product_qty = [int(row["qty"] or 0) for row in product_rows]
+	product_revenue = [float(row["revenue"] or 0) for row in product_rows]
+
+	total_revenue = round(sum(daily_totals), 2)
+	total_transactions = sum(daily_transactions)
+	avg_daily = round((total_revenue / len(rows)), 2) if rows else 0
+
+	return {
+		"daily_labels": daily_labels,
+		"daily_totals": daily_totals,
+		"daily_transactions": daily_transactions,
+		"weekday_labels": weekday_labels,
+		"weekday_totals": [round(v, 2) for v in weekday_totals],
+		"weekly_labels": weekly_labels,
+		"weekly_totals": weekly_values,
+		"product_labels": product_labels,
+		"product_qty": product_qty,
+		"product_revenue": product_revenue,
+		"analytics_total_revenue": _as_money(total_revenue),
+		"analytics_total_transactions": total_transactions,
+		"analytics_average_daily": _as_money(avg_daily),
 	}
 
 
@@ -190,6 +248,16 @@ def reports_daily_page(request):
 		"sale_dates": _sales_date_options(),
 	}
 	return render(request, "pos/reports_daily.html", context)
+
+
+@login_required(login_url="login")
+@require_GET
+def analytics_page(request):
+	context = {
+		**_totals_context(),
+		**_analytics_context(),
+	}
+	return render(request, "pos/analytics.html", context)
 
 
 @login_required(login_url="login")
