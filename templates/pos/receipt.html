@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Receipt #{{ sale.id }} | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar no-print">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link active" href="/sales/">Sales</a>
+    <a class="nav-link" href="/analytics/">Analytics</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/notifications/">Notifications</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header no-print">
+      <div>
+        <h1>Sale Completed</h1>
+        <p>Transaction #{{ sale.id }} Recorded Successfully.</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="window.print()">Print Receipt</button>
+        <a class="btn btn-primary" href="/sales/">New Sale</a>
+      </div>
+    </header>
+
+    <div class="receipt-paper card" style="max-width: 500px; margin: 0 auto; font-family: 'Courier New', Courier, monospace; padding: 40px; color: #333;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="margin-bottom: 5px; font-weight: bold;">JAMBO SPHERE</h2>
+        <p style="margin: 0; font-size: 0.9rem;">Official Sales Receipt</p>
+        <p style="margin: 5px 0; font-size: 0.8rem;">Date: {{ sale.sale_date|date:"F j, Y H:i" }}</p>
+      </div>
+
+      <div style="border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; font-size: 0.9rem;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Receipt No:</span>
+          <strong>#{{ sale.id }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>Sold By:</span>
+          <strong>{{ sale.sold_by.username|default:"System" }}</strong>
+        </div>
+        {% if sale.client_name %}
+        <div style="display: flex; justify-content: space-between;">
+          <span>Client:</span>
+          <strong>{{ sale.client_name }}</strong>
+        </div>
+        {% endif %}
+        {% if sale.client_contact %}
+        <div style="display: flex; justify-content: space-between;">
+          <span>Contact:</span>
+          <strong>{{ sale.client_contact }}</strong>
+        </div>
+        {% endif %}
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.9rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid #eee;">
+            <th style="text-align: left; padding: 8px 0;">Item</th>
+            <th style="text-align: center; padding: 8px 0;">Qty</th>
+            <th style="text-align: right; padding: 8px 0;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td style="padding: 8px 0;">
+              <div>{{ item.product.name }}</div>
+              <div style="font-size: 0.75rem; color: #666;">@ UGX {{ item.unit_price }}</div>
+            </td>
+            <td style="text-align: center; padding: 8px 0;">{{ item.quantity }}</td>
+            <td style="text-align: right; padding: 8px 0;">UGX {{ item.subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="border-top: 1px dashed #ccc; padding-top: 15px; font-size: 1rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>Subtotal:</span>
+          <span>UGX {{ sale.subtotal }}</span>
+        </div>
+        {% if sale.tax_rate > 0 %}
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span>Tax ({{ sale.tax_rate }}%):</span>
+          <span>UGX {{ sale.tax_amount }}</span>
+        </div>
+        {% endif %}
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-weight: bold; font-size: 1.2rem; border-top: 2px solid #333; padding-top: 10px;">
+          <span>GRAND TOTAL:</span>
+          <span>UGX {{ sale.total_amount }}</span>
+        </div>
+      </div>
+
+      {% if sale.notes %}
+      <div style="margin-top: 30px; padding: 10px; background: #f9f9f9; border-radius: 4px; font-size: 0.8rem;">
+        <strong>Notes:</strong><br>
+        {{ sale.notes }}
+      </div>
+      {% endif %}
+
+      <div style="text-align: center; margin-top: 40px; font-size: 0.8rem; color: #888;">
+        <p>Thank you for shopping with us!</p>
+        <p>Powered by Jambo Sphere POS</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .shell {
+      display: block !important;
+    }
+    .main {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .receipt-paper {
+      box-shadow: none !important;
+      border: none !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+    body {
+      background: white !important;
+    }
+  }
+</style>
+{% endblock %}
