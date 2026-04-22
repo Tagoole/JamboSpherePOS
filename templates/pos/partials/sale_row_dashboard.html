@@ -1,9 +1,8 @@
 {% for sale in sales %}
 <tr>
   <td>{{ sale.created_at_display }}</td>
-  <td>{{ sale.product_name }}</td>
-  <td>{{ sale.quantity }}</td>
-  <td>{{ sale.total_amount }}</td>
+  <td>#{{ sale.id }}</td>
+  <td>UGX {{ sale.total_amount }}</td>
 </tr>
 {% empty %}
 <tr>
