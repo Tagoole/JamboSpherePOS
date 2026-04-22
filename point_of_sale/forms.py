@@ -5,6 +5,12 @@ from django.contrib.auth.models import User
 from .models import Notification, Product, Sale, SaleItem
 
 
+class CategoryForm(models.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name"]
+
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
