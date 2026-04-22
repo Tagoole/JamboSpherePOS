@@ -15,7 +15,7 @@
         hx-target="#product-table-body"
         hx-swap="innerHTML"
         hx-confirm="Delete {{ product.name }}?"
-        hx-on::after-request="htmx.trigger(document.body, 'productsChanged');"
+        hx-on::after-request="htmx.trigger(document.body, 'productsChanged'); htmx.trigger(document.body, 'salesChanged');"
       >
         {% csrf_token %}
         <button class="btn btn-danger" type="submit">Delete</button>

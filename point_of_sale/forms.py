@@ -2,13 +2,19 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Product, Sale, SaleItem
+from .models import Notification, Product, Sale, SaleItem
 
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = "__all__"
+
+
+class NotificationForm(forms.ModelForm):
+    class Meta:
+        model = Notification
+        fields = ["title", "message"]
 
 
 class SaleForm(forms.ModelForm):

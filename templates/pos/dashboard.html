@@ -15,6 +15,7 @@
     <a class="nav-link" href="/sales/">Sales</a>
     <a class="nav-link" href="/analytics/">Analytics</a>
     <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/notifications/">Notifications</a>
     <a class="nav-link" href="/logout/">Logout</a>
   </aside>
 
@@ -34,22 +35,21 @@
       class="dashboard-metrics"
       id="dashboard-totals"
       hx-get="/partials/today-totals/"
-      hx-trigger="load, every 20s"
+      hx-trigger="load, every 20s, salesChanged from:body, productsChanged from:body"
       hx-swap="innerHTML"
     >
       {% include "pos/partials/today_totals.html" %}
     </section>
 
-    <section class="grid grid-2 dashboard-panels">
+    <section class="grid dashboard-panels" style="grid-template-columns: 1fr 1fr 1fr;">
       <article class="card panel-accent-teal">
-        <h3 style="margin-bottom: 10px;">Recent Products</h3>
+        <h3 style="margin-bottom: 15px;">Recent Products</h3>
         <div style="overflow-x: auto;">
           <table>
             <thead>
               <tr>
                 <th>Product</th>
                 <th>Price</th>
-                <th>Status</th>
               </tr>
             </thead>
             <tbody
@@ -65,14 +65,12 @@
       </article>
 
       <article class="card panel-accent-blue">
-        <h3 style="margin-bottom: 10px;">Recent Sales</h3>
+        <h3 style="margin-bottom: 15px;">Recent Sales</h3>
         <div style="overflow-x: auto;">
           <table>
             <thead>
               <tr>
                 <th>Time</th>
-                <th>Item</th>
-                <th>Qty</th>
                 <th>Amount</th>
               </tr>
             </thead>
@@ -85,6 +83,30 @@
               {% include "pos/partials/sale_row_dashboard.html" %}
             </tbody>
           </table>
+        </div>
+      </article>
+
+      <article class="card panel-accent-purple">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3>Notifications</h3>
+          <a href="/notifications/" class="tag" style="background: var(--brand-soft); color: var(--brand);">View All</a>
+        </div>
+        <div class="grid" style="gap: 12px;">
+          {% for notification in notifications %}
+          <div style="padding: 10px; border-radius: 8px; background: #fafdfc; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+              <strong style="font-size: 0.9rem; color: var(--ink);">{{ notification.title }}</strong>
+              <small class="muted" style="font-size: 0.75rem;">{{ notification.created_at|timesince }} ago</small>
+            </div>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+              {{ notification.message }}
+            </p>
+          </div>
+          {% empty %}
+          <div class="empty" style="padding: 15px; font-size: 0.85rem;">
+            No new notifications.
+          </div>
+          {% endfor %}
         </div>
       </article>
     </section>

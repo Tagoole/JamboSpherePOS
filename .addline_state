@@ -10,3 +10,9 @@ templates/pos/partials/sale_row.html
 templates/pos/product_edit.html
 templates/pos/products.html
 templates/pos/sales.html
+.addline_state
+point_of_sale/urls.py
+point_of_sale/views.py
+templates/pos/analytics.html
+templates/pos/dashboard.html
+templates/pos/reports_daily.html

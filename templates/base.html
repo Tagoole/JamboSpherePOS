@@ -14,19 +14,19 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
     :root {
-      --bg: #f4fffe;
-      --bg-soft: #e8fbf9;
+      --bg: #eef3f2;
+      --bg-soft: #e6efee;
       --surface: #ffffff;
-      --ink: #12373a;
-      --ink-soft: #3a6366;
-      --brand: #10b7b0;
-      --brand-soft: #dcf8f6;
-      --accent: #25cfc8;
-      --accent-2: #8cebe7;
-      --accent-3: #14b8a6;
+      --ink: #132426;
+      --ink-soft: #567175;
+      --brand: #19b48f;
+      --brand-soft: #d9f7ef;
+      --accent: #2dd4a6;
+      --accent-2: #8ce7d0;
+      --accent-3: #14a37f;
       --danger: #c0392b;
-      --border: #cfeeed;
-      --shadow: 0 14px 30px rgba(10, 96, 102, 0.12);
+      --border: #e1eceb;
+      --shadow: 0 16px 28px rgba(9, 44, 50, 0.09);
     }
 
     * {
@@ -38,9 +38,9 @@
       margin: 0;
       padding: 0;
       background:
-        radial-gradient(circle at 0% 0%, #d4faf7 0%, transparent 24%),
-        radial-gradient(circle at 100% 90%, #c7f4f1 0%, transparent 28%),
-        radial-gradient(circle at 70% 25%, #e8fffd 0%, transparent 18%),
+        radial-gradient(circle at 8% 2%, #dbece9 0%, transparent 24%),
+        radial-gradient(circle at 95% 88%, #dbece8 0%, transparent 26%),
+        radial-gradient(circle at 74% 20%, #f8fbfb 0%, transparent 16%),
         var(--bg);
       color: var(--ink);
       font-family: "IBM Plex Sans", sans-serif;
@@ -66,30 +66,31 @@
 
     .shell {
       display: grid;
-      grid-template-columns: 240px 1fr;
+      grid-template-columns: 250px 1fr;
       min-height: 100vh;
     }
 
     .sidebar {
       background:
-        linear-gradient(164deg, rgba(7, 108, 114, 0.97), rgba(9, 140, 145, 0.95)),
-        linear-gradient(22deg, rgba(140, 235, 231, 0.56), transparent 48%);
+        linear-gradient(180deg, rgba(5, 74, 77, 0.97), rgba(5, 66, 69, 0.98)),
+        linear-gradient(25deg, rgba(29, 176, 139, 0.35), transparent 46%);
       color: #f3f6ff;
-      padding: 26px 18px;
+      padding: 24px 16px;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
+      border-right: 1px solid rgba(215, 242, 233, 0.2);
     }
 
     .sidebar::after {
       content: "";
       position: absolute;
-      width: 180px;
-      height: 180px;
-      right: -70px;
-      bottom: -60px;
-      background: radial-gradient(circle, rgba(183, 251, 247, 0.52), transparent 65%);
+      width: 220px;
+      height: 220px;
+      right: -85px;
+      bottom: -70px;
+      background: radial-gradient(circle, rgba(152, 242, 216, 0.45), transparent 65%);
       pointer-events: none;
     }
 
@@ -103,11 +104,11 @@
     .brand-badge {
       width: 34px;
       height: 34px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #e6fffd, #8cebe7);
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ddfff4, #8ce7d0);
       display: grid;
       place-items: center;
-      color: #0c5a5f;
+      color: #095051;
       font-weight: 700;
     }
 
@@ -119,10 +120,10 @@
 
     .nav-link {
       display: block;
-      padding: 10px 12px;
+      padding: 11px 12px;
       border-radius: 12px;
       margin-bottom: 8px;
-      color: rgba(242, 246, 255, 0.94);
+      color: rgba(228, 246, 243, 0.92);
       font-weight: 500;
       transition: transform 120ms ease, background 120ms ease;
       position: relative;
@@ -131,25 +132,26 @@
 
     .nav-link:hover {
       transform: translateX(3px);
-      background: rgba(255, 255, 255, 0.17);
+      background: rgba(143, 238, 205, 0.18);
     }
 
     .nav-link.active {
-      background: #ffffff;
-      color: #0d5f64;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(135deg, #19b48f, #2dd4a6);
+      color: #f4fffb;
+      box-shadow: 0 8px 16px rgba(19, 136, 112, 0.38);
     }
 
     .main {
-      padding: 28px;
+      padding: 26px;
+      background: #f3f7f7;
     }
 
     .page-header {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       animation: rise-in 350ms ease;
     }
 
@@ -160,7 +162,7 @@
 
     .grid {
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
 
     .dashboard-metrics {
@@ -207,7 +209,7 @@
 
     .totals-grid {
       display: grid;
-      gap: 24px;
+      gap: 18px;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       align-items: stretch;
     }
@@ -215,24 +217,29 @@
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
-      padding: 18px;
+      padding: 16px;
       animation: rise-in 320ms ease;
     }
 
+    .main > .card,
+    .main > section.card {
+      background: #ffffff;
+    }
+
     .panel-accent-teal {
-      border-top: 4px solid #10b7b0;
-      background: linear-gradient(180deg, #ffffff 0%, #f3fffe 100%);
+      border-top: 4px solid #19b48f;
+      background: linear-gradient(180deg, #ffffff 0%, #f6fffb 100%);
     }
 
     .panel-accent-blue {
-      border-top: 4px solid #3b82f6;
+      border-top: 4px solid #2f80ed;
       background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
     }
 
     .panel-accent-green {
-      border-top: 4px solid #22c55e;
+      border-top: 4px solid #27ae60;
       background: linear-gradient(180deg, #ffffff 0%, #f3fff6 100%);
     }
 
@@ -252,8 +259,8 @@
       display: grid;
       gap: 8px;
       min-height: 118px;
-      background: linear-gradient(160deg, #ffffff, var(--metric-tint, #f3fffe));
-      border-top: 4px solid var(--metric-accent, #10b7b0);
+      background: linear-gradient(160deg, #ffffff, var(--metric-tint, #f7fffd));
+      border-top: 4px solid var(--metric-accent, #19b48f);
     }
 
     .metric::after {
@@ -300,28 +307,29 @@
 
     .btn {
       border: 0;
-      border-radius: 12px;
-      padding: 11px 14px;
+      border-radius: 10px;
+      padding: 10px 14px;
       cursor: pointer;
       font-weight: 600;
       font-family: "IBM Plex Sans", sans-serif;
       transition: transform 120ms ease, box-shadow 120ms ease;
+      letter-spacing: 0.01em;
     }
 
     .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(16, 133, 137, 0.28);
+      box-shadow: 0 10px 18px rgba(22, 112, 104, 0.22);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0da9a2, #27d0c8);
+      background: linear-gradient(135deg, #19b48f, #2dd4a6);
       color: #ffffff;
     }
 
     .btn-secondary {
-      background: #e9fbfa;
-      color: #0f686d;
-      border: 1px solid var(--border);
+      background: #eff7f6;
+      color: #205a5f;
+      border: 1px solid #d9e8e6;
     }
 
     .btn-danger {
@@ -338,7 +346,7 @@
 
     .field label {
       font-size: 0.9rem;
-      color: #2d6063;
+      color: #355c60;
       font-weight: 600;
     }
 
@@ -347,38 +355,44 @@
     .field textarea {
       width: 100%;
       border: 1px solid var(--border);
-      border-radius: 11px;
+      border-radius: 10px;
       padding: 10px 12px;
       font: inherit;
       outline: none;
-      background: #fcfffb;
+      background: #fbfdfd;
     }
 
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
-      border-color: #57c5c0;
-      box-shadow: 0 0 0 3px rgba(62, 194, 186, 0.22);
+      border-color: #5acfb0;
+      box-shadow: 0 0 0 3px rgba(45, 212, 166, 0.2);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.96rem;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #edf3f2;
     }
 
     th,
     td {
       text-align: left;
       padding: 11px;
-      border-bottom: 1px solid #edf3eb;
+      border-bottom: 1px solid #edf2f2;
+      vertical-align: middle;
     }
 
     th {
-      color: #4f7477;
+      color: #5f7f82;
       font-size: 0.82rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      background: #f8fbfb;
     }
 
     .tag {
@@ -407,6 +421,10 @@
       background: #eefbfb;
       color: #0f666b;
       font-weight: 600;
+    }
+
+    .btn-link:hover {
+      background: #e3f7f2;
     }
 
     .summary-mini {
@@ -485,9 +503,9 @@
 
     .auth-card .card {
       padding: 28px;
-      border-radius: 20px;
-      background: linear-gradient(140deg, #ffffff, #f2fffe);
-      box-shadow: 0 20px 44px rgba(15, 102, 106, 0.14);
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 16px 30px rgba(13, 56, 61, 0.09);
     }
 
     .auth-meta {

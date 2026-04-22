@@ -20,10 +20,15 @@ urlpatterns = [
 	path("sales/<int:sale_id>/delete/", views.sale_delete, name="sale-delete"),
 	path("analytics/", views.analytics_page, name="analytics"),
 	path("reports/daily/", views.reports_daily_page, name="reports-daily"),
+	path("partials/analytics-summary/", views.partial_analytics_summary, name="partials-analytics-summary"),
 	path("partials/products-list/", views.partial_products_list, name="partials-products-list"),
 	path("partials/recent-products-list/", views.partial_recent_products_list, name="partials-recent-products-list"),
 	path("partials/sales-list/", views.partial_sales_list, name="partials-sales-list"),
 	path("partials/recent-sales-list/", views.partial_recent_sales_list, name="partials-recent-sales-list"),
 	path("partials/today-totals/", views.partial_today_totals, name="partials-today-totals"),
 	path("partials/daily-summary-details/", views.partial_daily_summary_details, name="partials-daily-summary-details"),
+	
+	# Notifications
+	path("notifications/", views.notifications_page, name="notifications"),
+	path("notifications/delete/<int:notification_id>/", views.notification_delete, name="notification-delete"),
 ]

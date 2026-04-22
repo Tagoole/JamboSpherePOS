@@ -1,11 +1,12 @@
-const STATIC_CACHE = 'jambopos-static-v4';
-const DYNAMIC_CACHE = 'jambopos-dynamic-v4';
+const STATIC_CACHE = 'jambopos-static-v5';
+const DYNAMIC_CACHE = 'jambopos-dynamic-v5';
 
 const APP_SHELL = [
   '/',
   '/dashboard/',
   '/products/',
   '/sales/',
+  '/analytics/',
   '/reports/daily/',
   '/static/js/offline-sync.js',
 ];
@@ -51,21 +52,28 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // Cache-first for app shell routes.
+  // Network-first for app shell routes so UI updates are visible quickly.
   if (requestUrl.origin === self.location.origin && APP_SHELL.includes(requestUrl.pathname)) {
     event.respondWith(
-      caches.match(event.request).then(function (cached) {
-        return (
-          cached ||
-          fetch(event.request).then(function (response) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then(function (cache) {
-              cache.put(event.request, responseClone);
-            });
-            return response;
-          })
-        );
-      })
+      fetch(event.request)
+        .then(function (response) {
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE).then(function (cache) {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(function () {
+          return caches.match(event.request).then(function (cached) {
+            return (
+              cached ||
+              new Response('Offline', {
+                status: 503,
+                statusText: 'Offline',
+              })
+            );
+          });
+        })
     );
     return;
   }

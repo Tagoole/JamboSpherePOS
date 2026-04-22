@@ -102,6 +102,10 @@
 
       if (action.scope === "products") {
         window.htmx.trigger(document.body, "productsChanged");
+
+        if (action.kind === "product-delete") {
+          window.htmx.trigger(document.body, "salesChanged");
+        }
       }
     }
   }

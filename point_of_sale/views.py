@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .forms import *
-from .models import Product, Sale, SaleItem
+from .models import Notification, Product, Sale, SaleItem
 
 
 def _as_money(value) -> str:
@@ -217,8 +217,41 @@ def dashboard_view(request):
 		**_totals_context(),
 		"products": Product.objects.order_by("-created_at")[:5],
 		"sales": _sales_rows(limit=5),
+		"notifications": Notification.objects.all()[:5],
 	}
 	return render(request, "pos/dashboard.html", context)
+
+
+@login_required(login_url="login")
+@require_http_methods(["GET", "POST"])
+def notifications_page(request):
+	if request.method == "POST":
+		if not request.user.is_staff:
+			return HttpResponseBadRequest("Only admins can create notifications.")
+		
+		form = NotificationForm(request.POST)
+		if form.is_valid():
+			notification = form.save(commit=False)
+			notification.created_by = request.user
+			notification.save()
+			return redirect("notifications")
+	
+	context = {
+		"notifications": Notification.objects.all(),
+		"form": NotificationForm() if request.user.is_staff else None
+	}
+	return render(request, "pos/notifications.html", context)
+
+
+@login_required(login_url="login")
+@require_POST
+def notification_delete(request, notification_id: int):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can delete notifications.")
+	
+	notification = get_object_or_404(Notification, pk=notification_id)
+	notification.delete()
+	return redirect("notifications")
 
 
 @login_required(login_url="login")
@@ -258,6 +291,16 @@ def analytics_page(request):
 		**_analytics_context(),
 	}
 	return render(request, "pos/analytics.html", context)
+
+
+@login_required(login_url="login")
+@require_GET
+def partial_analytics_summary(request):
+	context = {
+		**_totals_context(),
+		**_analytics_context(),
+	}
+	return render(request, "pos/partials/analytics_summary.html", context)
 
 
 @login_required(login_url="login")
@@ -378,6 +421,15 @@ def product_update(request, product_id: int):
 @require_POST
 def product_delete(request, product_id: int):
 	product = get_object_or_404(Product, pk=product_id)
+
+	# Keep analytics and sales screens consistent: if a product is removed,
+	# remove all sales that contain that product.
+	related_sale_ids = list(
+		SaleItem.objects.filter(product=product).values_list("sale_id", flat=True).distinct()
+	)
+	if related_sale_ids:
+		Sale.objects.filter(id__in=related_sale_ids).delete()
+
 	product.delete()
 
 	if request.headers.get("HX-Request") == "true":

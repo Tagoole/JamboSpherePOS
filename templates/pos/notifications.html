@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-badge">JS</span>
+      <div class="brand-title">Jambo Sphere POS</div>
+    </div>
+
+    <a class="nav-link" href="/dashboard/">Dashboard</a>
+    <a class="nav-link" href="/products/">Products</a>
+    <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link" href="/analytics/">Analytics</a>
+    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link active" href="/notifications/">Notifications</a>
+    <a class="nav-link" href="/logout/">Logout</a>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1>Notifications</h1>
+        <p>System-wide announcements and alerts.</p>
+      </div>
+    </header>
+
+    {% if form %}
+    <div class="card panel-accent-purple" style="margin-bottom: 24px;">
+      <h3 style="margin-bottom: 16px;">Create Notification</h3>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="field">
+          <label for="id_title">Title</label>
+          <input type="text" name="title" id="id_title" maxlength="200" required placeholder="Announcement Title">
+        </div>
+        <div class="field">
+          <label for="id_message">Message</label>
+          <textarea name="message" id="id_message" rows="3" required placeholder="Enter the announcement message here..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Publish Notification</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="grid dashboard-panels">
+      {% for notification in notifications %}
+      <article class="card {% cycle 'panel-accent-teal' 'panel-accent-blue' 'panel-accent-amber' %}">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <h3 style="color: var(--brand);">{{ notification.title }}</h3>
+          <span class="tag">{{ notification.created_at|date:"M d, Y H:i" }}</span>
+        </div>
+        <p style="white-space: pre-wrap; line-height: 1.6; color: var(--ink-soft);">{{ notification.message }}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; pt: 12px; border-top: 1px solid var(--border);">
+          <small class="muted">By: {{ notification.created_by.username }}</small>
+          {% if user.is_staff %}
+          <form action="{% url 'notification-delete' notification.id %}" method="POST" onsubmit="return confirm('Delete this notification?');">
+            {% csrf_token %}
+            <button type="submit" class="btn-link" style="background: #fff0f0; color: #c0392b; border-color: #f2cdca; cursor: pointer;">Delete</button>
+          </form>
+          {% endif %}
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty">
+        <p>No notifications available at the moment.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}

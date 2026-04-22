@@ -6,11 +6,45 @@ Simple Point of Sale prototype built with Django.
 
 - Add products
 - Record sales
+- Edit and delete products/sales
 - View daily totals
+- Product search on Products page
+- Analytics dashboard with comparison charts
 - Sign up and login pages
 - HTMX-based partial updates for smoother UI interactions
 - Progressive Web App (PWA) support
 - Offline capability for cached pages
+
+## UI Update (Latest)
+
+The app UI was refreshed to a modern POS theme inspired by panel-based cashier interfaces while preserving the existing structure and flows.
+
+What changed:
+
+- Updated global visual style for all existing screens (Dashboard, Products, Sales, Daily Totals, Auth pages).
+- Added an Analytics page in the sidebar navigation.
+- Preserved all existing business actions and routes (create/update/delete/partials), only updating presentation and adding analytics/search features.
+
+## Product Search
+
+- The Products screen now includes a search field to filter products by name.
+- Filtering is client-side and instant (no backend/API behavior was changed).
+
+## Analytics Page
+
+New route:
+
+- `/analytics/`
+
+Charts currently included:
+
+- Daily revenue trend (line chart)
+- Daily transactions trend (overlay line)
+- Revenue by weekday (bar chart)
+- Weekly revenue comparison (bar chart)
+- Top product mix by quantity sold (doughnut chart)
+
+Analytics data is generated from existing `Sale` and `SaleItem` records already in the system.
 
 ## PWA And Offline Capability
 
@@ -29,6 +63,7 @@ This project includes PWA support, which allows users to install the app and acc
 	- `/dashboard/`
 	- `/products/`
 	- `/sales/`
+	- `/analytics/`
 	- `/reports/daily/`
 2. This allows the service worker to cache these pages.
 3. After caching, you can still open cached pages when offline or when the dev server is stopped.
@@ -167,8 +202,10 @@ python manage.py check
 
 1. Sign up or log in.
 2. Go to Products and add product name and price.
-3. Go to Sales and record a sale.
-4. Open Dashboard or Daily Totals to review total sales.
+3. Use product search to quickly find items in Products.
+4. Go to Sales and record a sale.
+5. Open Dashboard or Daily Totals to review totals.
+6. Open Analytics to review daily/weekly trends and product mix charts.
 
 ## Notes
 

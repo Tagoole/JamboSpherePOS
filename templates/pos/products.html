@@ -13,7 +13,9 @@
     <a class="nav-link" href="/dashboard/">Dashboard</a>
     <a class="nav-link active" href="/products/">Products</a>
     <a class="nav-link" href="/sales/">Sales</a>
+    <a class="nav-link" href="/analytics/">Analytics</a>
     <a class="nav-link" href="/reports/daily/">Daily Totals</a>
+    <a class="nav-link" href="/notifications/">Notifications</a>
     <a class="nav-link" href="/logout/">Logout</a>
   </aside>
 
@@ -53,7 +55,13 @@
     </section>
 
     <section class="card" style="margin-top: 16px;">
-      <h3 style="margin-bottom: 12px;">All Products</h3>
+      <div style="display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+        <h3 style="margin: 0;">All Products</h3>
+        <div class="field" style="margin-bottom: 0; min-width: 260px; max-width: 360px; width: 100%;">
+          <label for="product-search">Search Products</label>
+          <input id="product-search" type="search" placeholder="Search by product name..." />
+        </div>
+      </div>
       <div style="overflow-x: auto;">
         <table>
           <thead>
@@ -77,4 +85,42 @@
     </section>
   </main>
 </div>
+
+<script>
+  (function () {
+    function filterProductRows() {
+      const input = document.getElementById("product-search");
+      const tbody = document.getElementById("product-table-body");
+      if (!input || !tbody) {
+        return;
+      }
+
+      const query = (input.value || "").trim().toLowerCase();
+      const rows = tbody.querySelectorAll("tr");
+      rows.forEach(function (row) {
+        const firstCell = row.querySelector("td");
+        if (!firstCell || row.querySelector(".empty")) {
+          row.style.display = "";
+          return;
+        }
+
+        const name = (firstCell.textContent || "").toLowerCase();
+        row.style.display = name.indexOf(query) !== -1 ? "" : "none";
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const input = document.getElementById("product-search");
+      if (input) {
+        input.addEventListener("input", filterProductRows);
+      }
+    });
+
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event && event.target && event.target.id === "product-table-body") {
+        filterProductRows();
+      }
+    });
+  })();
+</script>
 {% endblock %}
