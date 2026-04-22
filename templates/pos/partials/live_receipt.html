@@ -1,0 +1,48 @@
+{% load static %}
+<div class="glass" style="padding: 24px; color: var(--ink);">
+  <div style="text-align: center; margin-bottom: 24px;">
+    <h3 style="font-size: 1.1rem; color: var(--brand); letter-spacing: 1px;">LIVE RECEIPT</h3>
+    <small class="muted" style="text-transform: uppercase; font-size: 0.7rem;">Items being added summary</small>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+    {% for item in cart %}
+    <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.4); padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.5);">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span style="width: 28px; height: 28px; border-radius: 8px; background: var(--brand); color: white; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700;">{{ item.quantity }}</span>
+        <div>
+          <strong style="display: block; font-size: 0.9rem;">{{ item.product.name }}</strong>
+          <small class="muted" style="font-size: 0.75rem;">@ UGX {{ item.price }}</small>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <strong style="display: block; font-size: 0.95rem;">UGX {{ item.total_price }}</strong>
+        <form action="{% url 'cart_remove' item.product.id %}" method="post" hx-post="{% url 'cart_remove' item.product.id %}" hx-target="#live-receipt-container" style="margin: 0;">
+          {% csrf_token %}
+          <button type="submit" style="background: none; border: none; color: var(--danger); font-size: 0.7rem; cursor: pointer; padding: 0;">Remove</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty" style="padding: 40px 20px; border-radius: 20px; background: rgba(255,255,255,0.2);">
+      <p style="margin: 0; opacity: 0.5;">No items selected yet</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if cart %}
+  <div style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span class="muted" style="font-size: 0.85rem;">Items Count</span>
+      <span style="font-weight: 600;">{{ cart|length }} products</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px;">
+      <span class="muted" style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">Total Estimate</span>
+      <strong style="font-size: 1.5rem; color: var(--brand);">UGX {{ cart.get_total_price }}</strong>
+    </div>
+    <a href="{% url 'cart_detail' %}" class="btn btn-primary" style="display: block; width: 100%; margin-top: 24px; text-align: center; padding: 14px; border-radius: 16px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 10px 20px rgba(25, 180, 143, 0.2);">
+      GO TO CHECKOUT
+    </a>
+  </div>
+  {% endif %}
+</div>
