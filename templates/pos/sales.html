@@ -5,20 +5,7 @@
 
 {% block content %}
 <div class="shell">
-  <aside class="sidebar">
-    <div class="brand">
-      <span class="brand-badge">JS</span>
-      <div class="brand-title">Jambo Sphere POS</div>
-    </div>
-
-    <a class="nav-link" href="/dashboard/">Dashboard</a>
-    <a class="nav-link" href="/products/">Products</a>
-    <a class="nav-link active" href="/sales/">Sales</a>
-    <a class="nav-link" href="/analytics/">Analytics</a>
-    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
-    <a class="nav-link" href="/notifications/">Notifications</a>
-    <a class="nav-link" href="/logout/">Logout</a>
-  </aside>
+  {% include "pos/partials/sidebar.html" %}
 
   <main class="main">
     <header class="page-header">
@@ -28,86 +15,58 @@
       </div>
     </header>
 
-    <section class="sales-shell" style="grid-template-columns: 1fr 340px;">
+    <section class="sales-shell" style="grid-template-columns: 1fr 380px; gap: 32px;">
       <div class="sales-content">
-        <article class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 16px;">
-            <h3 style="margin: 0;">Select Products</h3>
+        <article class="glass" style="padding: 30px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; gap: 16px;">
+            <h3 style="margin: 0; font-size: 1.25rem;">Select Menu Items</h3>
             <div class="field" style="margin-bottom: 0; flex: 1;">
-              <input id="sale-product-search" type="search" placeholder="Search products..." />
+              <input id="sale-product-search" type="search" placeholder="Quick find product..." style="background: rgba(255,255,255,0.5); border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);" />
             </div>
           </div>
 
-          <div style="margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-secondary category-filter active" data-category="all">All</button>
+          <div style="margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary category-filter active" data-category="all" style="border-radius: 14px; padding: 10px 18px;">All Items</button>
             {% for cat in categories %}
-              <button class="btn btn-secondary category-filter" data-category="{{ cat.id }}">{{ cat.name }}</button>
+              <button class="btn btn-secondary category-filter" data-category="{{ cat.id }}" style="border-radius: 14px; padding: 10px 18px;">{{ cat.name }}</button>
             {% endfor %}
           </div>
 
-          <div class="grid" id="product-selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+          <div class="grid" id="product-selection-grid" style="grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px;">
             {% for product in products %}
-              <div class="card product-card" style="padding: 12px; transition: transform 0.2s;" 
+              <div class="card product-card glass" style="padding: 15px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);" 
                    data-name="{{ product.name|lower }}" 
                    data-category="{{ product.category_id|default:'none' }}">
                 {% if product.image %}
-                  <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 120px; border-radius: 8px; object-fit: cover; margin-bottom: 10px; border: 1px solid var(--border);">
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 140px; border-radius: 16px; object-fit: cover; margin-bottom: 15px;">
                 {% else %}
-                  <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 100%; height: 120px; border-radius: 8px; object-fit: contain; margin-bottom: 10px; border: 1px solid var(--border); padding: 20px; background: #fafafa; opacity: 0.7;">
+                  <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 100%; height: 140px; border-radius: 16px; object-fit: contain; margin-bottom: 15px; padding: 25px; background: rgba(255,255,255,0.5); opacity: 0.6;">
                 {% endif %}
-                <strong style="display: block; font-size: 1rem; margin-bottom: 4px;">{{ product.name }}</strong>
-                <p style="color: var(--brand); font-weight: 700; margin-bottom: 12px;">UGX {{ product.price }}</p>
+                <strong style="display: block; font-size: 1.05rem; margin-bottom: 6px; color: var(--ink);">{{ product.name }}</strong>
+                <p style="color: var(--brand); font-weight: 800; margin-bottom: 15px; font-size: 1.1rem;">UGX {{ product.price }}</p>
                 
-                <form action="{% url 'cart_add' product.id %}" method="post" hx-post="{% url 'cart_add' product.id %}" hx-target="#cart-badge" hx-swap="innerHTML">
+                <form action="{% url 'cart_add' product.id %}" method="post" hx-post="{% url 'cart_add' product.id %}" hx-target="#live-receipt-container" hx-swap="innerHTML">
                   {% csrf_token %}
-                  <div style="display: flex; gap: 6px;">
-                    <input type="number" name="quantity" value="1" min="1" style="width: 60px; padding: 6px; border-radius: 6px; border: 1px solid var(--border);">
-                    <button type="submit" class="btn btn-primary" style="flex: 1; padding: 6px 10px; font-size: 0.85rem;">Add</button>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="number" name="quantity" value="1" min="1" style="width: 60px; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); background: white;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; border-radius: 12px; font-size: 0.9rem;">ADD</button>
                   </div>
                 </form>
               </div>
             {% endfor %}
           </div>
         </article>
-
-        <section class="card panel-accent-blue" style="margin-top: 24px;">
-           <h3 style="margin-bottom: 15px;">Recent Completed Sales</h3>
-           <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>Sale ID</th>
-                  <th>Amount</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="sales-table-body" hx-get="/partials/sales-list/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
-                {% include "pos/partials/sale_row.html" %}
-              </tbody>
-            </table>
-          </div>
-        </section>
       </div>
 
-      <aside class="sales-form-sidebar">
-        <div class="card panel-accent-teal" style="position: sticky; top: 20px;">
-          <h3 style="margin-bottom: 16px;">Current Cart</h3>
-          <div id="cart-summary">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-              <span>Total Items:</span>
-              <strong id="cart-badge">
-                {% include "pos/partials/cart_count.html" with cart_count=cart|length %}
-              </strong>
-            </div>
-            <a href="{% url 'cart_detail' %}" class="btn btn-primary" style="width: 100%; text-align: center; display: block; padding: 12px;">
-              Review Cart & Checkout
-            </a>
+      <aside class="sales-form-sidebar" style="position: sticky; top: 26px;">
+        <div id="live-receipt-container" hx-get="/cart/partial/" hx-trigger="load" hx-swap="innerHTML">
+          <div class="glass" style="padding: 40px; text-align: center;">
+            <p class="muted">Initializing Live Receipt...</p>
           </div>
-          
-          <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border);">
-          
-          <h4 style="margin-bottom: 10px;">Quick Totals</h4>
+        </div>
+        
+        <div class="glass" style="margin-top: 24px; padding: 24px; border-top: 4px solid var(--brand);">
+          <h4 style="font-size: 0.9rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Today's Activity</h4>
           <article id="today-totals-panel" hx-get="/partials/today-totals/" hx-trigger="load, salesChanged from:body" hx-swap="innerHTML">
             {% include "pos/partials/today_totals.html" %}
           </article>

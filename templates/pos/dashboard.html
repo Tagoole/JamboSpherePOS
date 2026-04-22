@@ -4,20 +4,7 @@
 
 {% block content %}
 <div class="shell">
-  <aside class="sidebar">
-    <div class="brand">
-      <span class="brand-badge">JS</span>
-      <div class="brand-title">Jambo Sphere POS</div>
-    </div>
-
-    <a class="nav-link active" href="/dashboard/">Dashboard</a>
-    <a class="nav-link" href="/products/">Products</a>
-    <a class="nav-link" href="/sales/">Sales</a>
-    <a class="nav-link" href="/analytics/">Analytics</a>
-    <a class="nav-link" href="/reports/daily/">Daily Totals</a>
-    <a class="nav-link" href="/notifications/">Notifications</a>
-    <a class="nav-link" href="/logout/">Logout</a>
-  </aside>
+  {% include "pos/partials/sidebar.html" %}
 
   <main class="main">
     <header class="page-header greeting-banner" style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 32px; background: linear-gradient(135deg, var(--brand) 0%, #158b6e 100%); color: white; padding: 40px; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(25, 180, 143, 0.2);">

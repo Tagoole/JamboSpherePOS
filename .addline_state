@@ -31,3 +31,6 @@ point_of_sale/migrations/0005_sale_client_contact_sale_client_name_sale_notes_an
 templates/pos/partials/product_row_dashboard.html
 templates/pos/partials/today_totals.html
 templates/pos/receipt.html
+templates/pos/notifications.html
+templates/pos/partials/live_receipt.html
+templates/pos/partials/sidebar.html

@@ -538,7 +538,7 @@ def cart_add(request, product_id):
 		cart.remove(product)
 
 	if request.headers.get("HX-Request") == "true":
-		return render(request, "pos/partials/cart_count.html", {"cart_count": len(cart)})
+		return render(request, "pos/partials/live_receipt.html", {"cart": cart})
 	
 	# If request came from cart page, redirect back to cart
 	if "cart" in request.META.get("HTTP_REFERER", ""):
@@ -553,6 +553,10 @@ def cart_remove(request, product_id):
 	cart = Cart(request)
 	product = get_object_or_404(Product, id=product_id)
 	cart.remove(product)
+	
+	if request.headers.get("HX-Request") == "true":
+		return render(request, "pos/partials/live_receipt.html", {"cart": cart})
+		
 	return redirect("cart_detail")
 
 
@@ -560,6 +564,13 @@ def cart_remove(request, product_id):
 def cart_detail(request):
 	cart = Cart(request)
 	return render(request, "pos/cart.html", {"cart": cart})
+
+
+@login_required(login_url="login")
+@require_GET
+def cart_partial(request):
+	cart = Cart(request)
+	return render(request, "pos/partials/live_receipt.html", {"cart": cart})
 
 
 @login_required(login_url="login")
