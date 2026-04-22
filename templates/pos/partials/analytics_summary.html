@@ -1,48 +1,64 @@
-<section class="totals-grid" style="margin-bottom: 18px;">
-  <article class="card metric metric-total">
-    <small>Total Revenue (Available Data)</small>
-    <strong>{{ analytics_total_revenue }}</strong>
+<!-- KPIs Row -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(25, 180, 143, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
+    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Net Revenue</div>
+    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_total_revenue }}</div>
+    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Gross intake across history</div>
   </article>
-  <article class="card metric metric-transactions">
-    <small>Total Transactions</small>
-    <strong>{{ analytics_total_transactions }}</strong>
-  </article>
-  <article class="card metric metric-products">
-    <small>Average Revenue / Day</small>
-    <strong>{{ analytics_average_daily }}</strong>
-  </article>
-</section>
 
-<section class="grid grid-2 dashboard-panels">
-  <article class="card panel-accent-teal">
-    <h3 style="margin-bottom: 10px;">Daily Revenue Trend</h3>
-    <div style="height: 185px; max-width: 100%;">
-      <canvas id="dailyTrendChart" height="96"></canvas>
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(45, 212, 166, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
+    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Order Density</div>
+    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_total_transactions }}</div>
+    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Total completed transactions</div>
+  </article>
+
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(140, 231, 208, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
+    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Daily Velocity</div>
+    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_average_daily }}</div>
+    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Average daily revenue throughput</div>
+  </article>
+</div>
+
+<!-- Charts Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 32px;">
+  <article class="glass" style="padding: 30px;">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+      <span>📉</span> Revenue Velocity
+    </h3>
+    <div style="height: 300px; width: 100%;">
+      <canvas id="dailyTrendChart"></canvas>
     </div>
   </article>
 
-  <article class="card panel-accent-blue">
-    <h3 style="margin-bottom: 10px;">Weekday Revenue Pattern</h3>
-    <div style="height: 185px; max-width: 100%;">
-      <canvas id="weekdayChart" height="96"></canvas>
+  <article class="glass" style="padding: 30px;">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+      <span>🍕</span> Product Affinity
+    </h3>
+    <div style="height: 300px; width: 100%;">
+      <canvas id="productMixChart"></canvas>
     </div>
   </article>
 
-  <article class="card panel-accent-green">
-    <h3 style="margin-bottom: 10px;">Weekly Comparison</h3>
-    <div style="height: 185px; max-width: 100%;">
-      <canvas id="weeklyComparisonChart" height="96"></canvas>
+  <article class="glass" style="padding: 30px;">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+      <span>📅</span> Peak Operations
+    </h3>
+    <div style="height: 300px; width: 100%;">
+      <canvas id="weekdayChart"></canvas>
     </div>
   </article>
 
-  <article class="card panel-accent-amber">
-    <h3 style="margin-bottom: 10px;">Top Product Mix (Qty)</h3>
-    <div style="height: 185px; max-width: 100%;">
-      <canvas id="productMixChart" height="96"></canvas>
+  <article class="glass" style="padding: 30px;">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
+      <span>📊</span> Period Performance
+    </h3>
+    <div style="height: 300px; width: 100%;">
+      <canvas id="weeklyComparisonChart"></canvas>
     </div>
   </article>
-</section>
+</div>
 
+<!-- Data Carriers -->
 {{ daily_labels|json_script:"daily-labels-data" }}
 {{ daily_totals|json_script:"daily-totals-data" }}
 {{ daily_transactions|json_script:"daily-transactions-data" }}
@@ -53,157 +69,131 @@
 {{ product_labels|json_script:"product-labels-data" }}
 {{ product_qty|json_script:"product-qty-data" }}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
   (function () {
-    function parseJsonScript(id) {
-      const node = document.getElementById(id);
-      if (!node || !node.textContent) {
-        return [];
-      }
-      try {
-        return JSON.parse(node.textContent);
-      } catch (error) {
-        return [];
-      }
-    }
+    const parseData = (id) => JSON.parse(document.getElementById(id).textContent || "[]");
+    
+    const dailyLabels = parseData("daily-labels-data");
+    const dailyTotals = parseData("daily-totals-data");
+    const dailyTransactions = parseData("daily-transactions-data");
+    const weekdayLabels = parseData("weekday-labels-data");
+    const weekdayTotals = parseData("weekday-totals-data");
+    const weeklyLabels = parseData("weekly-labels-data");
+    const weeklyTotals = parseData("weekly-totals-data");
+    const productLabels = parseData("product-labels-data");
+    const productQty = parseData("product-qty-data");
 
-    const dailyLabels = parseJsonScript("daily-labels-data");
-    const dailyTotals = parseJsonScript("daily-totals-data");
-    const dailyTransactions = parseJsonScript("daily-transactions-data");
-    const weekdayLabels = parseJsonScript("weekday-labels-data");
-    const weekdayTotals = parseJsonScript("weekday-totals-data");
-    const weeklyLabels = parseJsonScript("weekly-labels-data");
-    const weeklyTotals = parseJsonScript("weekly-totals-data");
-    const productLabels = parseJsonScript("product-labels-data");
-    const productQty = parseJsonScript("product-qty-data");
-
-    const chartDefaults = {
-      color: "#315b5f",
-      borderColor: "#e6eff0",
-      font: {
-        family: "IBM Plex Sans"
-      }
+    // Chart Global Config
+    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+    Chart.defaults.color = "#5b7578";
+    
+    // Gradient Creator
+    const getGradient = (ctx, color) => {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        return gradient;
     };
 
-    Chart.defaults.color = chartDefaults.color;
-    Chart.defaults.borderColor = chartDefaults.borderColor;
-    Chart.defaults.font.family = chartDefaults.font.family;
-
-    const dailyCtx = document.getElementById("dailyTrendChart");
-    if (dailyCtx) {
-      new Chart(dailyCtx, {
-        type: "line",
-        data: {
-          labels: dailyLabels,
-          datasets: [
-            {
-              label: "Revenue",
-              data: dailyTotals,
-              borderColor: "#19b48f",
-              backgroundColor: "rgba(25, 180, 143, 0.18)",
-              fill: true,
-              tension: 0.35,
-              pointRadius: 2.5
-            },
-            {
-              label: "Transactions",
-              data: dailyTransactions,
-              borderColor: "#2f80ed",
-              backgroundColor: "rgba(47, 128, 237, 0.10)",
-              fill: false,
-              tension: 0.25,
-              pointRadius: 2
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
+    // 1. Daily Trend
+    const dailyCtx = document.getElementById("dailyTrendChart").getContext('2d');
+    new Chart(dailyCtx, {
+      type: "line",
+      data: {
+        labels: dailyLabels,
+        datasets: [{
+          label: "Revenue",
+          data: dailyTotals,
+          borderColor: "#19b48f",
+          backgroundColor: getGradient(dailyCtx, "rgba(25, 180, 143, 0.2)"),
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: "#19b48f"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { borderDash: [5, 5] }, ticks: { callback: v => 'UGX ' + v } }
         }
-      });
-    }
+      }
+    });
 
-    const weekdayCtx = document.getElementById("weekdayChart");
-    if (weekdayCtx) {
-      new Chart(weekdayCtx, {
-        type: "bar",
-        data: {
-          labels: weekdayLabels,
-          datasets: [
-            {
-              label: "Revenue by weekday",
-              data: weekdayTotals,
-              borderRadius: 8,
-              backgroundColor: [
-                "#4cc9f0",
-                "#4895ef",
-                "#4361ee",
-                "#3f37c9",
-                "#3a0ca3",
-                "#f4a261",
-                "#2a9d8f"
-              ]
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
+    // 2. Product Mix
+    new Chart(document.getElementById("productMixChart"), {
+      type: "doughnut",
+      data: {
+        labels: productLabels,
+        datasets: [{
+          data: productQty,
+          backgroundColor: ["#19b48f", "#2dd4a6", "#8ce7d0", "#21c45d", "#158b6e", "#10634e"],
+          borderWidth: 0,
+          hoverOffset: 20
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: { 
+            legend: { position: 'right', labels: { usePointStyle: true, padding: 20 } }
         }
-      });
-    }
+      }
+    });
 
-    const weeklyCtx = document.getElementById("weeklyComparisonChart");
-    if (weeklyCtx) {
-      new Chart(weeklyCtx, {
-        type: "bar",
-        data: {
-          labels: weeklyLabels,
-          datasets: [
-            {
-              label: "Revenue by week",
-              data: weeklyTotals,
-              borderRadius: 8,
-              backgroundColor: "#19b48f"
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
+    // 3. Peak Operations (Bar)
+    new Chart(document.getElementById("weekdayChart"), {
+      type: "bar",
+      data: {
+        labels: weekdayLabels,
+        datasets: [{
+          label: "Throughput",
+          data: weekdayTotals,
+          backgroundColor: "rgba(25, 180, 143, 0.8)",
+          borderRadius: 12,
+          maxBarThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { display: false }, ticks: { display: false } }
         }
-      });
-    }
+      }
+    });
 
-    const productCtx = document.getElementById("productMixChart");
-    if (productCtx) {
-      new Chart(productCtx, {
-        type: "doughnut",
-        data: {
-          labels: productLabels,
-          datasets: [
-            {
-              label: "Top products by quantity",
-              data: productQty,
-              backgroundColor: [
-                "#19b48f",
-                "#2f80ed",
-                "#f2994a",
-                "#9b51e0",
-                "#27ae60",
-                "#eb5757",
-                "#56ccf2",
-                "#f2c94c"
-              ]
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: "bottom" } }
+    // 4. Weekly Comparison
+    new Chart(document.getElementById("weeklyComparisonChart"), {
+      type: "bar",
+      data: {
+        labels: weeklyLabels,
+        datasets: [{
+          label: "Volume",
+          data: weeklyTotals,
+          borderWidth: 2,
+          borderColor: "#19b48f",
+          backgroundColor: "rgba(25, 180, 143, 0.1)",
+          borderRadius: 12,
+          maxBarThickness: 40
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { display: false } }
         }
-      });
-    }
+      }
+    });
   })();
 </script>
