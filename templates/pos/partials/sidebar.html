@@ -1,0 +1,57 @@
+<aside class="sidebar" id="main-sidebar">
+  <div class="brand" style="position: relative;">
+    <span class="brand-badge">JS</span>
+    <div class="brand-title">Jambo Sphere POS</div>
+    <button id="sidebar-toggle" style="position: absolute; right: -25px; top: 0; background: var(--brand); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1001;">
+      <span id="toggle-icon">❮</span>
+    </button>
+  </div>
+
+  <div style="flex: 1; margin-top: 20px;">
+    <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="/dashboard/">
+      <span class="icon">📊</span> <span>Dashboard</span>
+    </a>
+    <a class="nav-link {% if request.path == '/products/' %}active{% endif %}" href="/products/">
+      <span class="icon">📦</span> <span>Products</span>
+    </a>
+    <a class="nav-link {% if request.path == '/sales/' %}active{% endif %}" href="/sales/">
+      <span class="icon">💰</span> <span>Sales</span>
+    </a>
+    <a class="nav-link {% if request.path == '/analytics/' %}active{% endif %}" href="/analytics/">
+      <span class="icon">📈</span> <span>Analytics</span>
+    </a>
+    <a class="nav-link {% if '/reports/' in request.path %}active{% endif %}" href="/reports/daily/">
+      <span class="icon">📅</span> <span>Daily Totals</span>
+    </a>
+    <a class="nav-link {% if request.path == '/notifications/' %}active{% endif %}" href="/notifications/">
+      <span class="icon">🔔</span> <span>Notifications</span>
+    </a>
+  </div>
+
+  <div style="padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <a class="nav-link" href="/logout/" style="color: rgba(255,255,255,0.6);">
+      <span class="icon">🚪</span> <span>Logout</span>
+    </a>
+  </div>
+</aside>
+
+<script>
+  (function() {
+    const sidebar = document.getElementById('main-sidebar');
+    const toggle = document.getElementById('sidebar-toggle');
+    const icon = document.getElementById('toggle-icon');
+    
+    // Check local storage
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+      sidebar.classList.add('collapsed');
+      icon.innerText = '❯';
+    }
+
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('sidebar-collapsed', isCollapsed);
+      icon.innerText = isCollapsed ? '❯' : '❮';
+    });
+  })();
+</script>
