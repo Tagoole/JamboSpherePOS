@@ -1,8 +1,7 @@
 {% for product in products %}
 <tr>
-  <td>{{ product.name }}</td>
-  <td>{{ product.price }}</td>
-  <td><span class="tag">Active</span></td>
+  <td style="font-weight: 500;">{{ product.name }}</td>
+  <td style="text-align: right; font-weight: 600;">UGX {{ product.price }}</td>
 </tr>
 {% empty %}
 <tr>
