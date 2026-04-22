@@ -1,24 +1,26 @@
 {% for sale in sales %}
 <tr>
   <td>{{ sale.created_at_display }}</td>
-  <td>{{ sale.product_name }}</td>
-  <td>{{ sale.quantity }}</td>
-  <td>{{ sale.total_amount }}</td>
+  <td>#{{ sale.id }}</td>
+  <td>UGX {{ sale.total_amount }}</td>
   <td>
-    <form
-      method="post"
-      action="/sales/{{ sale.id }}/delete/"
-      data-offline-queue="true"
-      data-offline-success-event="salesChanged"
-      hx-post="/sales/{{ sale.id }}/delete/"
-      hx-target="#sales-table-body"
-      hx-swap="innerHTML"
-      hx-confirm="Delete this sale record?"
-      hx-on::after-request="htmx.trigger(document.body, 'salesChanged');"
-    >
-      {% csrf_token %}
-      <button class="btn btn-danger" type="submit">Delete</button>
-    </form>
+    <div class="actions">
+      <button class="btn-link" onclick="viewSaleDetails({{ sale.id }})">Details</button>
+      <form
+        method="post"
+        action="/sales/{{ sale.id }}/delete/"
+        data-offline-queue="true"
+        data-offline-success-event="salesChanged"
+        hx-post="/sales/{{ sale.id }}/delete/"
+        hx-target="#sales-table-body"
+        hx-swap="innerHTML"
+        hx-confirm="Delete this sale record?"
+        hx-on::after-request="htmx.trigger(document.body, 'salesChanged');"
+      >
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
   </td>
 </tr>
 {% empty %}

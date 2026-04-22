@@ -20,16 +20,26 @@
   </aside>
 
   <main class="main">
-    <header class="page-header">
-      <div>
-        <h1>Dashboard</h1>
-        <p>Monitor activity and jump into product or sales operations.</p>
+    <header class="page-header greeting-banner" style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 32px; background: linear-gradient(135deg, var(--brand) 0%, #158b6e 100%); color: white; padding: 40px; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(25, 180, 143, 0.2);">
+      <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+      <div style="position: absolute; bottom: -30px; right: 80px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+      
+      <div style="z-index: 1;">
+        <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Welcome Back, Admin</span>
+        <h1 style="font-size: 2.8rem; margin: 5px 0 10px 0; color: white; border: none;">Hello, {{ user.username|title }} 🌟</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9; font-weight: 300;">Today is <span id="current-date" style="font-weight: 600;">{{ "now"|date:"l, F j, Y" }}</span>. Here's what's happening in your business.</p>
       </div>
-      <div>
-        <a class="btn btn-secondary" href="/products/">Manage Products</a>
-        <a class="btn btn-primary" href="/sales/">Record Sale</a>
+      
+      <div style="z-index: 1; margin-top: 20px; display: flex; gap: 12px;">
+        <a class="btn" href="/sales/" style="background: white; color: var(--brand); font-weight: 600; padding: 12px 24px; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">New Sale Transaction</a>
+        <a class="btn" href="/analytics/" style="background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); font-weight: 500;">Business Performance</a>
       </div>
     </header>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="font-size: 1.4rem; margin: 0; color: var(--ink);">Real-time Performance</h2>
+      <div hx-get="/partials/today-totals/" hx-trigger="every 30s" hx-swap="none"></div>
+    </div>
 
     <section
       class="dashboard-metrics"
@@ -37,19 +47,23 @@
       hx-get="/partials/today-totals/"
       hx-trigger="load, every 20s, salesChanged from:body, productsChanged from:body"
       hx-swap="innerHTML"
+      style="margin-bottom: 32px;"
     >
       {% include "pos/partials/today_totals.html" %}
     </section>
 
-    <section class="grid dashboard-panels" style="grid-template-columns: 1fr 1fr 1fr;">
-      <article class="card panel-accent-teal">
-        <h3 style="margin-bottom: 15px;">Recent Products</h3>
+    <section class="grid dashboard-panels" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
+      <article class="card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.04); padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="font-size: 1.1rem; color: var(--ink); font-weight: 700;">Inventory Snapshot</h3>
+          <a href="/products/" style="font-size: 0.8rem; color: var(--brand); font-weight: 600;">Manage All &rarr;</a>
+        </div>
         <div style="overflow-x: auto;">
-          <table>
+          <table style="border: none;">
             <thead>
-              <tr>
-                <th>Product</th>
-                <th>Price</th>
+              <tr style="background: transparent;">
+                <th style="padding-left: 0; background: transparent; border-bottom: 2px solid #f0f4f3;">Item</th>
+                <th style="text-align: right; padding-right: 0; background: transparent; border-bottom: 2px solid #f0f4f3;">Valuation</th>
               </tr>
             </thead>
             <tbody
@@ -64,14 +78,18 @@
         </div>
       </article>
 
-      <article class="card panel-accent-blue">
-        <h3 style="margin-bottom: 15px;">Recent Sales</h3>
+      <article class="card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.04); padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="font-size: 1.1rem; color: var(--ink); font-weight: 700;">Revenue Stream</h3>
+          <a href="/sales/" style="font-size: 0.8rem; color: var(--brand); font-weight: 600;">Full Log &rarr;</a>
+        </div>
         <div style="overflow-x: auto;">
-          <table>
+          <table style="border: none;">
             <thead>
-              <tr>
-                <th>Time</th>
-                <th>Amount</th>
+              <tr style="background: transparent;">
+                <th style="padding-left: 0; background: transparent; border-bottom: 2px solid #f0f4f3;">Time</th>
+                <th style="background: transparent; border-bottom: 2px solid #f0f4f3;">Ref</th>
+                <th style="text-align: right; padding-right: 0; background: transparent; border-bottom: 2px solid #f0f4f3;">Total</th>
               </tr>
             </thead>
             <tbody
@@ -86,25 +104,25 @@
         </div>
       </article>
 
-      <article class="card panel-accent-purple">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-          <h3>Notifications</h3>
-          <a href="/notifications/" class="tag" style="background: var(--brand-soft); color: var(--brand);">View All</a>
+      <article class="card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.04); padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="font-size: 1.1rem; color: var(--ink); font-weight: 700;">Communications</h3>
+          <a href="/notifications/" class="tag" style="background: var(--brand-soft); color: var(--brand); font-size: 0.7rem;">Recent</a>
         </div>
-        <div class="grid" style="gap: 12px;">
+        <div class="grid" style="gap: 16px;">
           {% for notification in notifications %}
-          <div style="padding: 10px; border-radius: 8px; background: #fafdfc; border: 1px solid var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-              <strong style="font-size: 0.9rem; color: var(--ink);">{{ notification.title }}</strong>
-              <small class="muted" style="font-size: 0.75rem;">{{ notification.created_at|timesince }} ago</small>
+          <div style="padding: 16px; border-radius: 16px; background: #f8fafc; border: 1px solid #f1f5f9; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <strong style="font-size: 0.95rem; color: var(--ink);">{{ notification.title }}</strong>
+              <small class="muted" style="font-size: 0.7rem;">{{ notification.created_at|timesince }}</small>
             </div>
-            <p style="margin: 0; font-size: 0.85rem; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            <p style="margin: 0; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.5;">
               {{ notification.message }}
             </p>
           </div>
           {% empty %}
-          <div class="empty" style="padding: 15px; font-size: 0.85rem;">
-            No new notifications.
+          <div class="empty" style="border-radius: 16px; padding: 30px;">
+            <p style="margin: 0; opacity: 0.6;">Your inbox is clear.</p>
           </div>
           {% endfor %}
         </div>

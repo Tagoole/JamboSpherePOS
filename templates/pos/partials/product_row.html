@@ -1,6 +1,23 @@
+{% load static %}
 {% for product in products %}
 <tr>
-  <td>{{ product.name }}</td>
+  <td>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border);">
+      {% else %}
+        <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); opacity: 0.6;">
+      {% endif %}
+      <span>{{ product.name }}</span>
+    </div>
+  </td>
+  <td>
+    {% if product.category %}
+      <span class="tag" style="background: var(--brand-soft); color: var(--brand);">{{ product.category.name }}</span>
+    {% else %}
+      <span class="muted" style="font-size: 0.8rem;">Uncategorized</span>
+    {% endif %}
+  </td>
   <td>{{ product.price }}</td>
   <td><span class="tag">Active</span></td>
   <td>

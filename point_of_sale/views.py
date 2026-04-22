@@ -11,7 +11,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .forms import *
-from .models import Notification, Product, Sale, SaleItem
+from .models import Category, Notification, Product, Sale, SaleItem
+from .cart import Cart
 
 
 def _as_money(value) -> str:
@@ -155,23 +156,21 @@ def _analytics_context() -> dict:
 
 
 def _sales_rows(limit=None, report_date=None):
-	queryset = SaleItem.objects.select_related("sale", "product")
+	queryset = Sale.objects.all()
 	if report_date:
-		queryset = queryset.filter(sale__sale_date__date=report_date)
+		queryset = queryset.filter(sale_date__date=report_date)
 
-	queryset = queryset.order_by("-sale__sale_date", "-id")
+	queryset = queryset.order_by("-sale_date")
 	if limit:
 		queryset = queryset[:limit]
 
 	return [
 		{
-			"id": item.sale_id,
-			"created_at_display": timezone.localtime(item.sale.sale_date).strftime("%H:%M"),
-			"product_name": item.product.name,
-			"quantity": item.quantity,
-			"total_amount": _as_money(item.subtotal),
+			"id": sale.id,
+			"created_at_display": timezone.localtime(sale.sale_date).strftime("%H:%M"),
+			"total_amount": _as_money(sale.total_amount),
 		}
-		for item in queryset
+		for sale in queryset
 	]
 
 
@@ -257,7 +256,10 @@ def notification_delete(request, notification_id: int):
 @login_required(login_url="login")
 @require_GET
 def products_page(request):
-	context = {"products": Product.objects.all()}
+	context = {
+		"products": Product.objects.all(),
+		"categories": Category.objects.all()
+	}
 	return render(request, "pos/products.html", context)
 
 
@@ -266,10 +268,25 @@ def products_page(request):
 def sales_page(request):
 	context = {
 		"products": Product.objects.all(),
+		"categories": Category.objects.all(),
 		"sales": _sales_rows(),
 		**_totals_context(),
+		"cart": Cart(request),
 	}
 	return render(request, "pos/sales.html", context)
+
+
+@login_required(login_url="login")
+@require_POST
+def category_create(request):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can create categories.")
+	
+	form = CategoryForm(request.POST)
+	if form.is_valid():
+		form.save()
+		return redirect("products")
+	return HttpResponseBadRequest("Invalid category data.")
 
 
 @login_required(login_url="login")
@@ -348,8 +365,10 @@ def product_create(request):
 		form_data["name"] = form_data.get("product_name")
 	if "product_price" in form_data:
 		form_data["price"] = form_data.get("product_price")
+	if "product_category" in form_data:
+		form_data["category"] = form_data.get("product_category")
 
-	form = ProductForm(form_data)
+	form = ProductForm(form_data, request.FILES)
 	if not form.is_valid():
 		return HttpResponseBadRequest("Invalid product data.")
 
@@ -384,15 +403,21 @@ def product_edit_page(request, product_id: int):
 			form_data["name"] = form_data.get("product_name")
 		if "product_price" in form_data:
 			form_data["price"] = form_data.get("product_price")
+		if "product_category" in form_data:
+			form_data["category"] = form_data.get("product_category")
 
-		form = ProductForm(form_data, instance=product)
+		form = ProductForm(form_data, request.FILES, instance=product)
 		if form.is_valid():
 			form.save()
 			return redirect("products")
 	else:
 		form = ProductForm(instance=product)
 
-	return render(request, "pos/product_edit.html", {"form": form, "product": product})
+	return render(request, "pos/product_edit.html", {
+		"form": form,
+		"product": product,
+		"categories": Category.objects.all()
+	})
 
 
 @login_required(login_url="login")
@@ -405,8 +430,10 @@ def product_update(request, product_id: int):
 		form_data["name"] = form_data.get("product_name")
 	if "product_price" in form_data:
 		form_data["price"] = form_data.get("product_price")
+	if "product_category" in form_data:
+		form_data["category"] = form_data.get("product_category")
 
-	form = ProductForm(form_data, instance=product)
+	form = ProductForm(form_data, request.FILES, instance=product)
 	if not form.is_valid():
 		return HttpResponseBadRequest("Invalid product update data.")
 
@@ -496,3 +523,95 @@ def sale_delete(request, sale_id: int):
 	if request.headers.get("HX-Request") == "true":
 		return render(request, "pos/partials/sale_row.html", {"sales": _sales_rows()})
 	return redirect("sales")
+@login_required(login_url="login")
+@require_POST
+def cart_add(request, product_id):
+	cart = Cart(request)
+	product = get_object_or_404(Product, id=product_id)
+	quantity = int(request.POST.get("quantity", 1))
+	override = request.POST.get("override", "False") == "True"
+	
+	cart.add(product=product, quantity=quantity, override_quantity=override)
+	
+	# If quantity is <= 0 after update, remove it
+	if str(product.id) in cart.cart and cart.cart[str(product.id)]["quantity"] <= 0:
+		cart.remove(product)
+
+	if request.headers.get("HX-Request") == "true":
+		return render(request, "pos/partials/cart_count.html", {"cart_count": len(cart)})
+	
+	# If request came from cart page, redirect back to cart
+	if "cart" in request.META.get("HTTP_REFERER", ""):
+		return redirect("cart_detail")
+	
+	return redirect("sales")
+
+
+@login_required(login_url="login")
+@require_POST
+def cart_remove(request, product_id):
+	cart = Cart(request)
+	product = get_object_or_404(Product, id=product_id)
+	cart.remove(product)
+	return redirect("cart_detail")
+
+
+@login_required(login_url="login")
+def cart_detail(request):
+	cart = Cart(request)
+	return render(request, "pos/cart.html", {"cart": cart})
+
+
+@login_required(login_url="login")
+@require_POST
+def checkout(request):
+	cart = Cart(request)
+	if not cart:
+		return redirect("sales")
+
+	# Get extra info from form
+	client_name = request.POST.get("client_name", "")
+	client_contact = request.POST.get("client_contact", "")
+	notes = request.POST.get("notes", "")
+	tax_rate_val = Decimal(request.POST.get("tax_rate", "0"))
+
+	subtotal = Decimal(cart.get_total_price())
+	tax_amount = (subtotal * (tax_rate_val / 100)).quantize(Decimal("0.01"))
+	total_amount = subtotal + tax_amount
+
+	# Create the Sale
+	sale = Sale.objects.create(
+		subtotal=subtotal,
+		tax_rate=tax_rate_val,
+		tax_amount=tax_amount,
+		total_amount=total_amount,
+		client_name=client_name,
+		client_contact=client_contact,
+		notes=notes,
+		sold_by=request.user
+	)
+
+	# Record Sale Items
+	for item in cart:
+		SaleItem.objects.create(
+			sale=sale,
+			product=item["product"],
+			quantity=item["quantity"],
+			unit_price=item["price"]
+		)
+
+	# Clear Cart
+	cart.clear()
+
+	return redirect("sale_receipt", sale_id=sale.id)
+
+
+@login_required(login_url="login")
+@require_GET
+def sale_receipt(request, sale_id):
+	sale = get_object_or_404(Sale, id=sale_id)
+	context = {
+		"sale": sale,
+		"items": sale.items.all(),
+	}
+	return render(request, "pos/receipt.html", context)

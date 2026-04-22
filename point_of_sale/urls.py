@@ -31,4 +31,14 @@ urlpatterns = [
 	# Notifications
 	path("notifications/", views.notifications_page, name="notifications"),
 	path("notifications/delete/<int:notification_id>/", views.notification_delete, name="notification-delete"),
+
+	# Categories
+	path("categories/add/", views.category_create, name="category-create"),
+
+	# Cart
+	path("cart/", views.cart_detail, name="cart_detail"),
+	path("cart/add/<int:product_id>/", views.cart_add, name="cart_add"),
+	path("cart/remove/<int:product_id>/", views.cart_remove, name="cart_remove"),
+	path("cart/checkout/", views.checkout, name="checkout"),
+	path("sale/receipt/<int:sale_id>/", views.sale_receipt, name="sale_receipt"),
 ]
