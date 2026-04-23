@@ -1,9 +1,10 @@
 from datetime import datetime
+from decimal import Decimal
 
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Prefetch
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models.functions import TruncDate
@@ -16,7 +17,10 @@ from .cart import Cart
 
 
 def _as_money(value) -> str:
+	if value is None:
+		return "0.00"
 	return f"{value:.2f}"
+
 
 
 def _totals_context() -> dict:
@@ -53,7 +57,9 @@ def _selected_report_date(request):
 
 def _daily_summary_context(report_date) -> dict:
 	today_sales = Sale.objects.filter(sale_date__date=report_date).order_by("-sale_date")
-	today_items = SaleItem.objects.filter(sale__sale_date__date=report_date).select_related("product", "sale")
+	
+	# Optimize sale items fetching
+	today_items = SaleItem.objects.filter(sale__sale_date__date=report_date).select_related("product")
 
 	total_sales = today_sales.aggregate(total=Sum("total_amount"))["total"] or 0
 	transactions = today_sales.count()
@@ -61,17 +67,15 @@ def _daily_summary_context(report_date) -> dict:
 	unique_products = today_items.values("product_id").distinct().count()
 	average_ticket = (total_sales / transactions) if transactions else 0
 	highest_sale = today_sales.order_by("-total_amount").first()
+	
+	# More efficient aggregation for products sold
 	products_sold = (
 		today_items.values("product__name")
 		.annotate(total_qty=Sum("quantity"), revenue=Sum("subtotal"))
 		.order_by("-total_qty", "product__name")
 	)
-	top_product = (
-		today_items.values("product__name")
-		.annotate(total_qty=Sum("quantity"))
-		.order_by("-total_qty")
-		.first()
-	)
+	
+	top_product = products_sold.first()
 
 	products_sold_rows = [
 		{
@@ -99,6 +103,7 @@ def _daily_summary_context(report_date) -> dict:
 
 
 def _analytics_context() -> dict:
+	# Cache for expensive analytics if needed, but here we optimize the query first
 	rows = list(
 		Sale.objects.annotate(day=TruncDate("sale_date"))
 		.values("day")
@@ -106,20 +111,33 @@ def _analytics_context() -> dict:
 		.order_by("day")
 	)
 
-	daily_labels = [row["day"].strftime("%d %b") for row in rows]
-	daily_totals = [float(row["total"] or 0) for row in rows]
-	daily_transactions = [int(row["transactions"] or 0) for row in rows]
-
-	weekday_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+	daily_labels = []
+	daily_totals = []
+	daily_transactions = []
+	
 	weekday_totals = [0.0] * 7
-	for row in rows:
-		weekday_totals[row["day"].weekday()] += float(row["total"] or 0)
-
 	weekly_totals = {}
+	
+	total_revenue = 0.0
+	total_transactions = 0
+
 	for row in rows:
-		year, week, _ = row["day"].isocalendar()
+		day = row["day"]
+		total = float(row["total"] or 0)
+		transactions = int(row["transactions"] or 0)
+		
+		daily_labels.append(day.strftime("%d %b"))
+		daily_totals.append(total)
+		daily_transactions.append(transactions)
+		
+		weekday_totals[day.weekday()] += total
+		
+		year, week, _ = day.isocalendar()
 		key = f"{year}-W{int(week):02d}"
-		weekly_totals[key] = weekly_totals.get(key, 0.0) + float(row["total"] or 0)
+		weekly_totals[key] = weekly_totals.get(key, 0.0) + total
+		
+		total_revenue += total
+		total_transactions += transactions
 
 	weekly_items = list(weekly_totals.items())[-10:]
 	weekly_labels = [item[0] for item in weekly_items]
@@ -134,15 +152,13 @@ def _analytics_context() -> dict:
 	product_qty = [int(row["qty"] or 0) for row in product_rows]
 	product_revenue = [float(row["revenue"] or 0) for row in product_rows]
 
-	total_revenue = round(sum(daily_totals), 2)
-	total_transactions = sum(daily_transactions)
 	avg_daily = round((total_revenue / len(rows)), 2) if rows else 0
 
 	return {
 		"daily_labels": daily_labels,
 		"daily_totals": daily_totals,
 		"daily_transactions": daily_transactions,
-		"weekday_labels": weekday_labels,
+		"weekday_labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
 		"weekday_totals": [round(v, 2) for v in weekday_totals],
 		"weekly_labels": weekly_labels,
 		"weekly_totals": weekly_values,
@@ -212,11 +228,12 @@ def logout_view(request):
 @login_required(login_url="login")
 @require_GET
 def dashboard_view(request):
+	# Fetch only necessary fields or use select_related/prefetch_related
 	context = {
 		**_totals_context(),
-		"products": Product.objects.order_by("-created_at")[:5],
+		"products": Product.objects.select_related("category").order_by("-created_at")[:5],
 		"sales": _sales_rows(limit=5),
-		"notifications": Notification.objects.all()[:5],
+		"notifications": Notification.objects.select_related("created_by").all()[:5],
 	}
 	return render(request, "pos/dashboard.html", context)
 
