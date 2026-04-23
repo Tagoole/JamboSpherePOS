@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -120,14 +121,18 @@ WSGI_APPLICATION = "JamboPOS.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if os.environ.get('DJANGO_ENV') == 'production':
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
     DATABASES = {
         'default': dj_database_url.parse(
-            os.environ.get('DATABASE_URL'),
+            database_url,
             conn_max_age=600,
             ssl_require=True,
         )
     }
+elif os.environ.get('DJANGO_ENV') == 'production':
+    raise ImproperlyConfigured('DATABASE_URL must be set in production.')
 else:
     DATABASES = {
         'default': {
