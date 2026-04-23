@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "jambopos"
 version = "0.1.0"
@@ -10,3 +14,6 @@ dependencies = [
     "gunicorn>=22.0.0",
     "pillow>=12.2.0",
 ]
+
+[tool.setuptools]
+packages = ["JamboPOS", "point_of_sale"]
