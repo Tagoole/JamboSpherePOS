@@ -1,38 +1,47 @@
-<aside class="sidebar" id="main-sidebar">
-  <div class="brand" style="position: relative;">
-    <span class="brand-badge">JS</span>
-    <div class="brand-title">Jambo Sphere POS</div>
-    <button id="sidebar-toggle" style="position: absolute; right: -25px; top: 0; background: var(--brand); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1001;">
-      <span id="toggle-icon">❮</span>
-    </button>
+<aside class="sidebar" id="main-sidebar" style="position: relative; flex-shrink: 0;">
+  <div class="brand" style="justify-content: center; margin-bottom: 40px; padding: 10px 0;">
+    <span class="brand-badge" style="width: 40px; height: 40px; font-size: 1.2rem;">JS</span>
+    <div class="brand-title" style="margin-left: 12px; font-size: 1.1rem; letter-spacing: 0.5px;">Jambo Sphere</div>
   </div>
 
-  <div style="flex: 1; margin-top: 20px;">
-    <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="/dashboard/">
-      <span class="icon">📊</span> <span>Dashboard</span>
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: stretch;">
+    <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="/dashboard/" title="Dashboard">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">📊</div> 
+      <span class="link-text">Dashboard</span>
     </a>
-    <a class="nav-link {% if request.path == '/products/' %}active{% endif %}" href="/products/">
-      <span class="icon">📦</span> <span>Products</span>
+    <a class="nav-link {% if request.path == '/products/' %}active{% endif %}" href="/products/" title="Products">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">📦</div> 
+      <span class="link-text">Products</span>
     </a>
-    <a class="nav-link {% if request.path == '/sales/' %}active{% endif %}" href="/sales/">
-      <span class="icon">💰</span> <span>Sales</span>
+    <a class="nav-link {% if request.path == '/sales/' %}active{% endif %}" href="/sales/" title="Sales">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">💰</div> 
+      <span class="link-text">Sales</span>
     </a>
-    <a class="nav-link {% if request.path == '/analytics/' %}active{% endif %}" href="/analytics/">
-      <span class="icon">📈</span> <span>Analytics</span>
+    <a class="nav-link {% if request.path == '/analytics/' %}active{% endif %}" href="/analytics/" title="Analytics">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">📈</div> 
+      <span class="link-text">Analytics</span>
     </a>
-    <a class="nav-link {% if '/reports/' in request.path %}active{% endif %}" href="/reports/daily/">
-      <span class="icon">📅</span> <span>Daily Totals</span>
+    <a class="nav-link {% if '/reports/' in request.path %}active{% endif %}" href="/reports/daily/" title="Daily Reports">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">📅</div> 
+      <span class="link-text">Reports</span>
     </a>
-    <a class="nav-link {% if request.path == '/notifications/' %}active{% endif %}" href="/notifications/">
-      <span class="icon">🔔</span> <span>Notifications</span>
+    <a class="nav-link {% if request.path == '/notifications/' %}active{% endif %}" href="/notifications/" title="Notifications">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">🔔</div> 
+      <span class="link-text">Notifications</span>
     </a>
   </div>
 
-  <div style="padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-    <a class="nav-link" href="/logout/" style="color: rgba(255,255,255,0.6);">
-      <span class="icon">🚪</span> <span>Logout</span>
+  <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+    <a class="nav-link" href="/logout/" style="color: rgba(255,255,255,0.4);" title="Logout">
+      <div class="icon-wrapper" style="min-width: 40px; height: 40px; display: grid; place-items: center; font-size: 1.2rem;">🚪</div> 
+      <span class="link-text">Logout</span>
     </a>
   </div>
+
+  <!-- Manual Toggle for Precise Control -->
+  <button id="sidebar-toggle" style="position: absolute; right: -12px; top: 110px; background: var(--brand); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1002;">
+    <span id="toggle-icon">❮</span>
+  </button>
 </aside>
 
 <script>
@@ -40,18 +49,33 @@
     const sidebar = document.getElementById('main-sidebar');
     const toggle = document.getElementById('sidebar-toggle');
     const icon = document.getElementById('toggle-icon');
+    const mainContent = document.querySelector('.main');
     
-    // Check local storage
-    if (localStorage.getItem('sidebar-collapsed') === 'true') {
-      sidebar.classList.add('collapsed');
-      icon.innerText = '❯';
+    function setSidebarState(collapsed) {
+      if (collapsed) {
+        sidebar.classList.add('collapsed');
+        icon.innerText = '❯';
+      } else {
+        sidebar.classList.remove('collapsed');
+        icon.innerText = '❮';
+      }
+      localStorage.setItem('sidebar-collapsed', collapsed);
     }
 
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-      const isCollapsed = sidebar.classList.contains('collapsed');
-      localStorage.setItem('sidebar-collapsed', isCollapsed);
-      icon.innerText = isCollapsed ? '❯' : '❮';
+    // Initial State
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    setSidebarState(isCollapsed);
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setSidebarState(!sidebar.classList.contains('collapsed'));
+    });
+
+    // Auto-collapse when clicking on the main screen side
+    mainContent.addEventListener('click', () => {
+      if (!sidebar.classList.contains('collapsed')) {
+        setSidebarState(true);
+      }
     });
   })();
 </script>

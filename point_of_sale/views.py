@@ -575,6 +575,16 @@ def cart_partial(request):
 
 @login_required(login_url="login")
 @require_POST
+def cart_clear(request):
+	cart = Cart(request)
+	cart.clear()
+	if request.headers.get("HX-Request") == "true":
+		return render(request, "pos/partials/live_receipt.html", {"cart": cart})
+	return redirect("sales")
+
+
+@login_required(login_url="login")
+@require_POST
 def checkout(request):
 	cart = Cart(request)
 	if not cart:

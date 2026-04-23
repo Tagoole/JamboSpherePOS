@@ -1,0 +1,11 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+media/products/*
+staticfiles/
+.DS_Store

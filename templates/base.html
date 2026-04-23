@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg: #f0f5f4;
@@ -153,7 +154,7 @@
       overflow: hidden;
     }
     
-    .sidebar.collapsed .nav-link span {
+    .sidebar.collapsed .link-text {
       display: none;
     }
 
@@ -163,6 +164,11 @@
 
     .sidebar.collapsed .brand {
       justify-content: center;
+    }
+    
+    .sidebar.collapsed .nav-link {
+      justify-content: center;
+      padding: 11px 0;
     }
 
     .nav-link:hover {
@@ -756,7 +762,7 @@
     }
   </style>
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% block content %}{% endblock %}
   
   <footer class="no-print" style="text-align: center; padding: 40px 20px; color: var(--ink-soft); font-size: 0.85rem; background: transparent;">
