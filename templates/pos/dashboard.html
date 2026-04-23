@@ -14,7 +14,7 @@
       <div style="z-index: 1;">
         <span style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Welcome Back, Admin</span>
         <h1 style="font-size: 2.8rem; margin: 5px 0 10px 0; color: white; border: none;">Hello, {{ user.username|title }} 🌟</h1>
-        <p style="font-size: 1.1rem; opacity: 0.9; font-weight: 300;">Today is <span id="current-date" style="font-weight: 600;">{{ "now"|date:"l, F j, Y" }}</span>. Here's what's happening in your business.</p>
+        <p style="font-size: 1.1rem; color: #000; font-weight: 300;">Today is <span id="current-date" style="font-weight: 600;">{% now "l, F j, Y" %}</span>. Here's what's happening in your business.</p>
       </div>
       
       <div style="z-index: 1; margin-top: 20px; display: flex; gap: 12px;">
