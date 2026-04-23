@@ -63,7 +63,11 @@ SECRET_KEY = "django-insecure--v6y&3mkd6u#to-$(^45vx+iw_7l3ag-k@(3+@jv!7r-_8nd32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "jambo-pos.tagooledavid.com",
+    "localhost",
+    "127.0.0.1"
+]
 
 
 # Application definition
