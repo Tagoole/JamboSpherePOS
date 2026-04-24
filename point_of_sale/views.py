@@ -102,75 +102,6 @@ def _daily_summary_context(report_date) -> dict:
 	}
 
 
-def _analytics_context() -> dict:
-	# Cache for expensive analytics if needed, but here we optimize the query first
-	rows = list(
-		Sale.objects.annotate(day=TruncDate("sale_date"))
-		.values("day")
-		.annotate(total=Sum("total_amount"), transactions=Count("id"))
-		.order_by("day")
-	)
-
-	daily_labels = []
-	daily_totals = []
-	daily_transactions = []
-	
-	weekday_totals = [0.0] * 7
-	weekly_totals = {}
-	
-	total_revenue = 0.0
-	total_transactions = 0
-
-	for row in rows:
-		day = row["day"]
-		total = float(row["total"] or 0)
-		transactions = int(row["transactions"] or 0)
-		
-		daily_labels.append(day.strftime("%d %b"))
-		daily_totals.append(total)
-		daily_transactions.append(transactions)
-		
-		weekday_totals[day.weekday()] += total
-		
-		year, week, _ = day.isocalendar()
-		key = f"{year}-W{int(week):02d}"
-		weekly_totals[key] = weekly_totals.get(key, 0.0) + total
-		
-		total_revenue += total
-		total_transactions += transactions
-
-	weekly_items = list(weekly_totals.items())[-10:]
-	weekly_labels = [item[0] for item in weekly_items]
-	weekly_values = [round(item[1], 2) for item in weekly_items]
-
-	product_rows = (
-		SaleItem.objects.values("product__name")
-		.annotate(qty=Sum("quantity"), revenue=Sum("subtotal"))
-		.order_by("-qty", "product__name")[:8]
-	)
-	product_labels = [row["product__name"] for row in product_rows]
-	product_qty = [int(row["qty"] or 0) for row in product_rows]
-	product_revenue = [float(row["revenue"] or 0) for row in product_rows]
-
-	avg_daily = round((total_revenue / len(rows)), 2) if rows else 0
-
-	return {
-		"daily_labels": daily_labels,
-		"daily_totals": daily_totals,
-		"daily_transactions": daily_transactions,
-		"weekday_labels": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-		"weekday_totals": [round(v, 2) for v in weekday_totals],
-		"weekly_labels": weekly_labels,
-		"weekly_totals": weekly_values,
-		"product_labels": product_labels,
-		"product_qty": product_qty,
-		"product_revenue": product_revenue,
-		"analytics_total_revenue": _as_money(total_revenue),
-		"analytics_total_transactions": total_transactions,
-		"analytics_average_daily": _as_money(avg_daily),
-	}
-
-
 def _sales_rows(limit=None, report_date=None):
 	queryset = SaleItem.objects.select_related("product", "sale").all()
 	if report_date:
@@ -397,25 +328,6 @@ def reports_daily_page(request):
 
 
 @login_required(login_url="login")
-@require_GET
-def analytics_page(request):
-	context = {
-		**_totals_context(),
-		**_analytics_context(),
-	}
-	return render(request, "pos/analytics.html", context)
-
-
-@login_required(login_url="login")
-@require_GET
-def partial_analytics_summary(request):
-	context = {
-		**_totals_context(),
-		**_analytics_context(),
-	}
-	return render(request, "pos/partials/analytics_summary.html", context)
-
-
 @login_required(login_url="login")
 @require_GET
 def partial_products_list(request):

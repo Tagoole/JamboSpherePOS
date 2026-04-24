@@ -1,97 +1,274 @@
 {% extends "base.html" %}
 {% load static humanize %}
 
-{% block title %}Point of Sale | Jambo Sphere POS{% endblock %}
+{% block title %}Terminal | Jambo Sphere POS{% endblock %}
 
 {% block content %}
-<div class="shell" style="height: 100vh; overflow: hidden; background: #eef2f6;">
+<div class="shell" style="height: 100vh; overflow: hidden; background: #0f172a; display: flex;">
   {% include "pos/partials/sidebar.html" %}
 
-  <main class="main" style="padding: 0; display: flex; flex-direction: row; height: 100vh; width: 100%;">
+  <main style="flex: 1; display: flex; overflow: hidden; background: #f8fafc; border-radius: 30px 0 0 30px; margin: 10px 0 10px 10px; box-shadow: -20px 0 60px rgba(0,0,0,0.1);">
     
-    <!-- Central Product Area -->
-    <section style="flex: 1; display: flex; flex-direction: column; background: #ffffff; min-width: 0; border-right: 1px solid #e1e8ed;">
+    <!-- Left: Product Discovery -->
+    <section style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
       
-      <!-- Top Header Area -->
-      <header style="padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.02); z-index: 10;">
-          <div style="font-size: 1.5rem; font-family: 'Space Grotesk'; font-weight: 700; color: var(--ink);">Point Of Sale</div>
-          <div style="position: relative; width: 400px; display: block; visibility: visible;">
-            <input id="sale-product-search" type="search" placeholder="Search menu..." style="width: 100%; padding: 14px 20px 14px 48px; border-radius: 30px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.95rem; outline: none; transition: all 0.3s; visibility: visible; display: block;" />
-            <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); opacity: 0.5; font-size: 1.1rem; visibility: visible;">🔍</span>
+      <!-- Modern Header -->
+      <header style="padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9;">
+          <div>
+            <h1 style="font-size: 1.8rem; font-weight: 800; color: #1e293b; margin: 0; letter-spacing: -0.5px;">Sales Terminal</h1>
+            <p style="font-size: 0.9rem; color: #64748b; margin-top: 4px;">Select products to build an order</p>
+          </div>
+          
+          <div style="position: relative; width: 350px;">
+            <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; opacity: 0.4;">🔍</span>
+            <input id="sale-product-search" type="search" placeholder="Quick find product..." 
+                   style="width: 100%; padding: 14px 20px 14px 50px; border-radius: 16px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.95rem; outline: none; transition: all 0.3s; color: #1e293b;" 
+                   onfocus="this.style.borderColor='var(--brand)'; this.style.background='#fff'; this.style.boxShadow='0 0 0 4px rgba(25, 180, 143, 0.1)';" 
+                   onblur="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc'; this.style.boxShadow='none';" />
           </div>
       </header>
 
-      <!-- Category Filter Chips -->
-      <div style="padding: 20px 30px; display: flex; gap: 12px; overflow-x: auto; flex-wrap: nowrap; border-bottom: 1px dashed #e2e8f0; background: #fafbfc;">
-          <button class="cat-chip active" data-filter="all" style="padding: 8px 20px; border-radius: 20px; border: none; background: var(--brand); color: white; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s;">All Categories</button>
-          {% for category in categories %}
-            <button class="cat-chip" data-filter="{{ category.id }}" style="padding: 8px 20px; border-radius: 20px; border: 1px solid #dae4e8; background: #fff; color: var(--ink-soft); font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s;">{{ category.name }}</button>
-          {% endfor %}
+      <!-- Horizontal Category Scroll -->
+      <div style="padding: 20px 40px; background: #fff; border-bottom: 1px solid #f1f5f9;">
+          <div id="category-scroller" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;">
+              <button class="pos-cat-chip active" data-filter="all">All Items</button>
+              {% for category in categories %}
+                <button class="pos-cat-chip" data-filter="{{ category.id }}">{{ category.name }}</button>
+              {% endfor %}
+          </div>
       </div>
 
-      <!-- Product Grid -->
-      <div id="product-selection-grid" style="flex: 1; overflow-y: auto; padding: 30px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); grid-auto-rows: min-content; gap: 20px; align-content: start;">
+      <!-- Optimized Product Grid -->
+      <div id="product-selection-grid" style="flex: 1; overflow-y: auto; padding: 30px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; align-content: start;">
         {% csrf_token %}
         {% for product in products %}
-        <div class="product-card" 
-             style="background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9; padding: 12px; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: flex; flex-direction: column; user-select: none;"
+        <div class="pos-product-card" 
              data-name="{{ product.name|lower }}" 
              data-category="{{ product.category_id|default:'none' }}"
              hx-post="{% url 'cart_add' product.id %}" 
              hx-vals='{"quantity": 1}'
              hx-target="#live-receipt-container" 
              hx-swap="innerHTML"
-             onmousedown="this.style.transform='scale(0.95)';"
-             onmouseup="this.style.transform='scale(1)';"
-             onmouseleave="this.style.transform='scale(1)';">
+             hx-indicator="#receipt-loader">
              
-          <div style="width: 100%; height: 140px; border-radius: 14px; overflow: hidden; margin-bottom: 12px; background: #f8fafc;">
+          <div class="pos-card-img-wrap">
             {% if product.image %}
-              <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
             {% else %}
-              <div style="width: 100%; height: 100%; display: grid; place-items: center; font-size: 2.5rem; background: rgba(0,0,0,0.02);">🍽️</div>
+              <div class="pos-card-placeholder">🍽️</div>
             {% endif %}
+            <div class="pos-card-overlay">
+               <span style="font-size: 1.5rem; color: white; font-weight: 700;">+</span>
+            </div>
           </div>
           
-          <strong style="display: block; font-size: 0.95rem; line-height: 1.2; margin-bottom: 8px; color: var(--ink); font-weight: 700;">{{ product.name }}</strong>
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-            <span style="font-weight: 800; color: var(--brand); font-size: 1.05rem;">UGX {{ product.price|intcomma }}</span>
-            <div style="width: 32px; height: 32px; border-radius: 10px; background: #edf9f6; color: var(--brand); display: grid; place-items: center; font-size: 1.2rem; font-weight: 800;">+</div>
+          <div style="padding: 12px;">
+            <strong class="pos-card-title">{{ product.name }}</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <span class="pos-card-price">UGX {{ product.price|intcomma }}</span>
+              <span class="pos-card-plus">+</span>
+            </div>
           </div>
         </div>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Right Side Live Receipt -->
-    <aside style="width: 400px; background: #fdfdfd; display: flex; flex-direction: column; overflow: hidden;">
-      <div id="live-receipt-container" hx-get="{% url 'cart_partial' %}" hx-trigger="load" hx-swap="innerHTML" style="flex: 1; display: flex; flex-direction: column; height: 100%;">
-        <!-- Initial Loader -->
-        <div style="flex: 1; display: grid; place-items: center; opacity: 0.4;">
-          <div style="text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🧾</div>
-            <p style="font-weight: 600; font-size: 0.9rem;">Initializing Terminal...</p>
-          </div>
-        </div>
+    <!-- Right: Glassmorphism Receipt -->
+    <aside style="width: 420px; background: #ffffff; display: flex; flex-direction: column; border-left: 1px solid #f1f5f9; position: relative;">
+      
+      <!-- Subtle Loading Indicator (non-blocking) -->
+      <div id="receipt-loader" class="htmx-indicator" style="position: absolute; top: 10px; right: 10px; z-index: 50;">
+         <div class="pos-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+      </div>
+
+      <div id="live-receipt-container" style="flex: 1; display: flex; flex-direction: column; height: 100%;">
+        {% include "pos/partials/live_receipt.html" %}
       </div>
     </aside>
   </main>
 </div>
 
-<!-- HTMX Config for CSRF -->
-<script>
-  document.body.addEventListener('htmx:configRequest', (event) => {
-    const token = document.querySelector('[name=csrfmiddlewaretoken]');
-    if (token) {
-        event.detail.headers['X-CSRFToken'] = token.value;
-    }
-  });
+<style>
+  /* Modern CSS Variables & Mixins */
+  :root {
+    --pos-card-shadow: 0 10px 25px rgba(0,0,0,0.03);
+    --pos-card-hover: 0 20px 40px rgba(0,0,0,0.08);
+  }
 
+  .pos-cat-chip {
+    padding: 10px 24px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pos-cat-chip:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateY(-1px);
+  }
+
+  .pos-cat-chip.active {
+    background: #1e293b;
+    color: #fff;
+    border-color: #1e293b;
+    box-shadow: 0 10px 20px rgba(30, 41, 59, 0.2);
+  }
+
+  .pos-product-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid #f1f5f9;
+    padding: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-shadow: var(--pos-card-shadow);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pos-product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--pos-card-hover);
+    border-color: var(--brand);
+  }
+
+  .pos-card-img-wrap {
+    width: 100%;
+    height: 150px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f8fafc;
+    position: relative;
+  }
+
+  .pos-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .pos-product-card:hover .pos-card-img-wrap img {
+    transform: scale(1.1);
+  }
+
+  .pos-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(25, 180, 143, 0.8);
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .pos-product-card:hover .pos-card-overlay {
+    opacity: 1;
+  }
+
+  .pos-card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-size: 3rem;
+    background: #f1f5f9;
+  }
+
+  .pos-card-title {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pos-card-price {
+    font-weight: 800;
+    color: var(--brand);
+    font-size: 1.05rem;
+    letter-spacing: -0.5px;
+  }
+
+  .pos-card-plus {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #1e293b;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    font-weight: 800;
+    transition: all 0.2s;
+  }
+
+  .pos-product-card:hover .pos-card-plus {
+    background: var(--brand);
+    color: #fff;
+    transform: rotate(90deg);
+  }
+
+  .pos-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+  }
+
+  .htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+    pointer-events: none;
+  }
+  .htmx-request .htmx-indicator, .htmx-request.htmx-indicator {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Success Flash */
+  @keyframes flash-success {
+    0% { background: #fff; }
+    50% { background: #dcfce7; }
+    100% { background: #fff; }
+  }
+  .success-add {
+    animation: flash-success 0.5s ease;
+  }
+</style>
+
+<!-- Business Logic Script -->
+<script>
   (function () {
     const searchInput = document.getElementById("sale-product-search");
-    const chips = document.querySelectorAll(".cat-chip");
-    const cards = document.querySelectorAll(".product-card");
+    const chips = document.querySelectorAll(".pos-cat-chip");
+    const cards = document.querySelectorAll(".pos-product-card");
     
     let currentFilter = "all";
     let currentSearch = "";
@@ -121,21 +298,30 @@
     
     chips.forEach(chip => {
       chip.addEventListener("click", function() {
-        chips.forEach(c => {
-          c.classList.remove("active");
-          c.style.background = "#fff";
-          c.style.color = "var(--ink-soft)";
-          c.style.border = "1px solid #dae4e8";
-        });
-        
+        chips.forEach(c => c.classList.remove("active"));
         this.classList.add("active");
-        this.style.background = "var(--brand)";
-        this.style.color = "white";
-        this.style.border = "none";
         
         currentFilter = this.getAttribute("data-filter");
         updateVisibility();
       });
+    });
+
+    // Success feedback on click
+    cards.forEach(card => {
+       card.addEventListener('click', () => {
+          card.classList.add('success-add');
+          setTimeout(() => card.classList.remove('success-add'), 500);
+          
+          // Audio feedback if desired: new Audio('/static/sounds/beep.mp3').play();
+       });
+    });
+
+    // Config HTMX CSRF
+    document.body.addEventListener('htmx:configRequest', (event) => {
+      const token = document.querySelector('[name=csrfmiddlewaretoken]');
+      if (token) {
+          event.detail.headers['X-CSRFToken'] = token.value;
+      }
     });
 
   })();

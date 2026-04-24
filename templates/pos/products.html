@@ -1,49 +1,112 @@
 {% extends "base.html" %}
 
-{% block title %}Products | Jambo Sphere POS{% endblock %}
+{% block title %}Products Inventory | Jambo Sphere POS{% endblock %}
 
 {% block content %}
-<div class="shell">
+<div class="shell" style="background: #f8fafc;">
   {% include "pos/partials/sidebar.html" %}
 
-    <main class="main">
-    <header class="page-header" style="margin-bottom: 32px;">
-      <div>
-        <h1 style="font-size: 2rem;">Product Inventory</h1>
-        <p>Control your warehouse and menu offerings with precision.</p>
+  <main class="main" style="padding: 40px;">
+    <!-- Modern Header with Stats -->
+    <header style="margin-bottom: 40px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+        <div>
+          <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--ink); margin: 0; letter-spacing: -1px;">Catalog Management</h1>
+          <p style="color: var(--ink-soft); font-size: 1.1rem; margin-top: 8px;">Organize and track your business offerings.</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+           <button class="btn btn-primary" onclick="document.getElementById('quick-add-section').scrollIntoView({behavior: 'smooth'})" style="padding: 12px 24px; border-radius: 14px; display: flex; align-items: center; gap: 8px;">
+             <span style="font-size: 1.2rem;">+</span> New Item
+           </button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div class="glass" style="padding: 20px; border-radius: 20px; display: flex; align-items: center; gap: 15px;">
+          <div style="background: var(--brand-soft); color: var(--brand); width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem;">📦</div>
+          <div>
+            <small style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 1px;">Total Items</small>
+            <strong style="display: block; font-size: 1.4rem;">{{ products|length }}</strong>
+          </div>
+        </div>
+        <div class="glass" style="padding: 20px; border-radius: 20px; display: flex; align-items: center; gap: 15px;">
+          <div style="background: #fef3c7; color: #d97706; width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem;">📁</div>
+          <div>
+            <small style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 1px;">Categories</small>
+            <strong style="display: block; font-size: 1.4rem;">{{ categories|length }}</strong>
+          </div>
+        </div>
+        <div class="glass" style="padding: 20px; border-radius: 20px; display: flex; align-items: center; gap: 15px;">
+          <div style="background: #e0f2fe; color: #0284c7; width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem;">💎</div>
+          <div>
+            <small style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 1px;">Active Menu</small>
+            <strong style="display: block; font-size: 1.4rem;">Live</strong>
+          </div>
+        </div>
       </div>
     </header>
 
-    <div class="grid" style="grid-template-columns: 320px 1fr; gap: 32px; align-items: start;">
-      <aside style="display: flex; flex-direction: column; gap: 32px; position: sticky; top: 26px;">
-        {% if user.is_staff %}
-        <section class="glass" style="padding: 24px;">
-          <h3 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">New Category</h3>
-          <form method="post" action="/categories/add/">
-            {% csrf_token %}
-            <div class="field">
-              <input name="name" type="text" placeholder="e.g. Desserts" required style="background: rgba(255,255,255,0.4);" />
-            </div>
-            <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Create</button>
-          </form>
-        </section>
+    <div class="grid" style="grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+      <!-- Main Content Area -->
+      <div style="display: flex; flex-direction: column; gap: 30px;">
+        
+        <!-- Search and Filters Bar -->
+        <div class="glass" style="padding: 10px 20px; border-radius: 20px; display: flex; align-items: center; gap: 20px; border: 1px solid rgba(255,255,255,0.8);">
+          <div style="position: relative; flex: 1;">
+            <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.5;">🔍</span>
+            <input id="product-search" type="search" placeholder="Filter by product name..." 
+                   style="width: 100%; border: none; background: transparent; padding: 12px 12px 12px 45px; font-size: 1rem; outline: none;" />
+          </div>
+          <div style="width: 1px; height: 30px; background: var(--border);"></div>
+          <div id="category-chips" style="display: flex; gap: 8px; overflow-x: auto; padding: 5px 0;">
+             <button class="cat-chip active" data-filter="all" style="padding: 6px 16px; border-radius: 12px; border: none; background: var(--brand); color: white; cursor: pointer; font-weight: 600; white-space: nowrap; font-size: 0.85rem;">All</button>
+             {% for cat in categories %}
+               <button class="cat-chip" data-filter="{{ cat.name|lower }}" style="padding: 6px 16px; border-radius: 12px; border: 1px solid var(--border); background: #fff; color: var(--ink-soft); cursor: pointer; font-weight: 600; white-space: nowrap; font-size: 0.85rem; transition: 0.2s;">{{ cat.name }}</button>
+             {% endfor %}
+          </div>
+        </div>
 
-        {% if categories %}
-        <section class="glass" style="padding: 24px;">
-          <h3 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Categories</h3>
-          <div id="category-list" 
-               hx-get="{% url 'category-list' %}" 
-            hx-trigger="load, productsChanged from:body" 
-               hx-swap="innerHTML">
-            <!-- Loader -->
-            <div style="text-align: center; opacity: 0.5; padding: 20px;">Loading...</div>
+        <!-- Inventory Table Container -->
+        <section class="card" style="padding: 0; border-radius: 24px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.03); overflow: hidden; background: #fff;">
+          <div style="padding: 25px 30px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+             <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--ink);">Master Inventory</h3>
+             <span id="product-count-badge" class="tag" style="background: var(--brand-soft); color: var(--brand);">Showing {{ products|length }} items</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
+              <thead>
+                <tr style="background: #fafbfc; text-align: left;">
+                  <th style="padding: 18px 30px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Product Details</th>
+                  <th style="padding: 18px 20px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Category</th>
+                  <th style="padding: 18px 20px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Unit Price</th>
+                  <th style="padding: 18px 20px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Visibility</th>
+                  <th style="padding: 18px 30px; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody
+                id="product-table-body"
+                hx-get="/partials/products-list/"
+                hx-trigger="load, productsChanged from:body"
+                hx-swap="innerHTML"
+              >
+                {% include "pos/partials/product_row.html" %}
+              </tbody>
+            </table>
           </div>
         </section>
-        {% endif %}
-        {% endif %}
+      </div>
 
-        <section class="glass" style="padding: 24px; border-top: 4px solid var(--accent);">
-          <h3 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Quick Add</h3>
+      <!-- Right Side Management Panel -->
+      <aside style="display: flex; flex-direction: column; gap: 30px;">
+        
+        <!-- Categories Section -->
+        {% if user.is_staff %}
+        <section id="quick-add-section" class="glass" style="padding: 30px; border-radius: 24px; border: 1px solid #fff;">
+          <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; color: var(--ink); font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <span style="background: var(--brand); color: white; width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; font-size: 0.7rem;">+</span>
+            Quick Add Product
+          </h3>
+          
           <form
             method="post"
             action="/products/add/"
@@ -53,22 +116,23 @@
             hx-swap="innerHTML"
             hx-encoding="multipart/form-data"
             hx-on::after-request="this.reset(); htmx.trigger(document.body, 'productsChanged');"
+            style="display: flex; flex-direction: column; gap: 18px;"
           >
             {% csrf_token %}
             <div class="field">
-              <label>Name</label>
-              <input name="product_name" type="text" placeholder="Soda 500ml" required style="background: rgba(255,255,255,0.4);" />
+              <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-soft);">Product Name</label>
+              <input name="product_name" type="text" placeholder="Enter name..." required style="border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.6);" />
             </div>
 
             <div class="field">
-              <label>Price</label>
-              <input name="product_price" type="number" step="0.01" min="0" placeholder="0.00" required style="background: rgba(255,255,255,0.4);" />
+              <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-soft);">Selling Price (UGX)</label>
+              <input name="product_price" type="number" step="0.01" min="0" placeholder="0" required style="border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.6);" />
             </div>
 
             <div class="field">
-              <label>Category</label>
-              <select name="product_category" style="background: rgba(255,255,255,0.4);">
-                <option value="">Ungrouped</option>
+              <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-soft);">Category Assignment</label>
+              <select name="product_category" style="border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.6); -webkit-appearance: none;">
+                <option value="">No Category</option>
                 {% for cat in categories %}
                   <option value="{{ cat.id }}">{{ cat.name }}</option>
                 {% endfor %}
@@ -76,81 +140,131 @@
             </div>
 
             <div class="field">
-              <label>Image (Optional)</label>
-              <input type="file" name="image" accept="image/*" style="font-size: 0.8rem; background: none; border: none; padding-left: 0;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: var(--ink-soft);">Product Visual</label>
+              <div style="border: 2px dashed #e2e8f0; border-radius: 12px; padding: 15px; text-align: center; position: relative; background: rgba(255,255,255,0.4);">
+                 <input type="file" name="image" accept="image/*" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
+                 <span style="font-size: 1.2rem;">🖼️</span>
+                 <p style="font-size: 0.7rem; margin-top: 5px; color: var(--ink-soft); font-weight: 600;">Click to upload image</p>
+              </div>
             </div>
 
-            <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 15px; padding: 14px;">Register Product</button>
+            <button class="btn btn-primary" type="submit" style="padding: 15px; border-radius: 14px; margin-top: 10px; font-weight: 700;">Add to Inventory</button>
           </form>
         </section>
-      </aside>
 
-      <section class="glass" style="padding: 30px;">
-        <div style="display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
-          <h3 style="margin: 0; font-size: 1.2rem;">Master Inventory List</h3>
-          <div class="field" style="margin-bottom: 0; min-width: 260px; max-width: 360px; width: 100%;">
-            <input id="product-search" type="search" placeholder="Search catalog..." style="background: rgba(255,255,255,0.5); border-radius: 12px;" />
+        <section class="glass" style="padding: 30px; border-radius: 24px; border: 1px solid #fff;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); font-weight: 800;">Categories</h3>
+            <button onclick="toggleCategoryForm()" class="btn-link" style="font-size: 0.7rem;">New Cat +</button>
           </div>
-        </div>
-        <div style="overflow-x: auto;">
-          <table style="border: none;">
-            <thead>
-              <tr style="background: transparent;">
-                <th style="padding-left: 0; background: transparent; border-bottom: 2px solid #f0f4f3;">Identifier</th>
-                <th style="background: transparent; border-bottom: 2px solid #f0f4f3;">Category</th>
-                <th style="background: transparent; border-bottom: 2px solid #f0f4f3;">Unit Price</th>
-                <th style="background: transparent; border-bottom: 2px solid #f0f4f3;">Status</th>
-                <th style="padding-right: 0; background: transparent; border-bottom: 2px solid #f0f4f3; text-align: right;">Operations</th>
-              </tr>
-            </thead>
-            <tbody
-              id="product-table-body"
-              hx-get="/partials/products-list/"
-              hx-trigger="load, productsChanged from:body"
-              hx-swap="innerHTML"
-            >
-              {% include "pos/partials/product_row.html" %}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+          <!-- Hidden New Category Form -->
+          <div id="new-category-form-wrap" style="display: none; margin-bottom: 20px; animation: slideDown 0.3s ease;">
+             <form method="post" action="/categories/add/" style="display: flex; gap: 8px;">
+                {% csrf_token %}
+                <input name="name" type="text" placeholder="Category name..." required style="flex: 1; border-radius: 10px; padding: 8px 12px; border: 1px solid var(--border); font-size: 0.9rem;">
+                <button class="btn btn-primary" type="submit" style="padding: 8px 15px; border-radius: 10px;">Save</button>
+             </form>
+          </div>
+          
+          <div id="category-list" 
+               hx-get="{% url 'category-list' %}" 
+               hx-trigger="load, productsChanged from:body" 
+               hx-swap="innerHTML">
+            <div style="text-align: center; opacity: 0.5; padding: 20px;">Refreshing...</div>
+          </div>
+        </section>
+        {% endif %}
+      </aside>
     </div>
   </main>
 </div>
 
+<style>
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .cat-chip:hover {
+    border-color: var(--brand) !important;
+    color: var(--brand) !important;
+  }
+  
+  .cat-chip.active {
+    background: var(--brand) !important;
+    color: white !important;
+    border-color: var(--brand) !important;
+    box-shadow: 0 4px 12px rgba(25, 180, 143, 0.2);
+  }
+
+  /* Custom Table Styling */
+  #product-table-body tr {
+    transition: all 0.2s;
+  }
+  
+  #product-table-body tr:hover {
+    background-color: #f8fafc;
+  }
+</style>
+
 <script>
+  function toggleCategoryForm() {
+    const wrap = document.getElementById('new-category-form-wrap');
+    wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
+  }
+
   (function () {
-    function filterProductRows() {
-      const input = document.getElementById("product-search");
-      const tbody = document.getElementById("product-table-body");
-      if (!input || !tbody) {
-        return;
-      }
+    function filterProducts() {
+      const searchQuery = document.getElementById("product-search").value.toLowerCase();
+      const activeChip = document.querySelector(".cat-chip.active");
+      const categoryFilter = activeChip.getAttribute("data-filter");
+      
+      const rows = document.querySelectorAll("#product-table-body tr:not(.empty-row)");
+      let visibleCount = 0;
 
-      const query = (input.value || "").trim().toLowerCase();
-      const rows = tbody.querySelectorAll("tr");
-      rows.forEach(function (row) {
-        const firstCell = row.querySelector("td");
-        if (!firstCell || row.querySelector(".empty")) {
+      rows.forEach(row => {
+        const name = row.querySelector(".product-name-cell").textContent.toLowerCase();
+        const category = row.querySelector(".product-category-cell").textContent.toLowerCase();
+        
+        const matchesSearch = name.includes(searchQuery);
+        const matchesCategory = categoryFilter === "all" || category.includes(categoryFilter);
+
+        if (matchesSearch && matchesCategory) {
           row.style.display = "";
-          return;
+          visibleCount++;
+        } else {
+          row.style.display = "none";
         }
-
-        const name = (firstCell.textContent || "").toLowerCase();
-        row.style.display = name.indexOf(query) !== -1 ? "" : "none";
       });
+      
+      const emptyMsg = document.querySelector(".empty-row");
+      if (emptyMsg) {
+        emptyMsg.style.display = visibleCount === 0 ? "" : "none";
+      }
+      
+      document.getElementById('product-count-badge').innerText = `Showing ${visibleCount} items`;
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-      const input = document.getElementById("product-search");
-      if (input) {
-        input.addEventListener("input", filterProductRows);
+      const searchInput = document.getElementById("product-search");
+      if (searchInput) {
+        searchInput.addEventListener("input", filterProducts);
       }
+
+      // Chip Filter logic
+      document.getElementById('category-chips').addEventListener('click', (e) => {
+        if (e.target.classList.contains('cat-chip')) {
+          document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+          e.target.classList.add('active');
+          filterProducts();
+        }
+      });
     });
 
     document.body.addEventListener("htmx:afterSwap", function (event) {
       if (event && event.target && event.target.id === "product-table-body") {
-        filterProductRows();
+        filterProducts();
       }
     });
   })();
