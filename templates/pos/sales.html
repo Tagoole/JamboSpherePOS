@@ -38,39 +38,64 @@
           </div>
       </div>
 
-      <!-- Optimized Product Grid -->
-      <div id="product-selection-grid" style="flex: 1; overflow-y: auto; padding: 30px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; align-content: start;">
+      <!-- Optimized Product Grid with Category Grouping -->
+      <div id="product-selection-grid" style="flex: 1; overflow-y: auto; padding: 10px 40px 40px; display: flex; flex-direction: column; gap: 30px; align-content: start;">
         {% csrf_token %}
-        {% for product in products %}
-        <div class="pos-product-card" 
-             data-name="{{ product.name|lower }}" 
-             data-category="{{ product.category_id|default:'none' }}"
-             hx-post="{% url 'cart_add' product.id %}" 
-             hx-vals='{"quantity": 1}'
-             hx-target="#live-receipt-container" 
-             hx-swap="innerHTML"
-             hx-indicator="#receipt-loader">
-             
-          <div class="pos-card-img-wrap">
-            {% if product.image %}
-              <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            {% else %}
-              <div class="pos-card-placeholder">
-                <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 60px; height: 60px; opacity: 0.2;">
-              </div>
-            {% endif %}
-            <div class="pos-card-overlay">
-               <span style="font-size: 1.5rem; color: white; font-weight: 700;">+</span>
-            </div>
+        
+        {% regroup products by category as category_list %}
+        
+        {% for group in category_list %}
+        <div class="pos-category-section" data-group-category="{{ group.grouper.id|default:'none' }}">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 20px 0 10px; position: sticky; top: 0; background: #f8fafc; z-index: 5;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #1e293b; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+              {{ group.grouper.name|default:"Uncategorized" }}
+            </h3>
+            <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: #94a3b8; background: #fff; padding: 4px 10px; border-radius: 20px; border: 1px solid #f1f5f9;">
+              {{ group.list|length }} Items
+            </span>
           </div>
           
-          <div style="padding: 12px;">
-            <strong class="pos-card-title">{{ product.name }}</strong>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-              <span class="pos-card-price">UGX {{ product.price|intcomma }}</span>
-              <span class="pos-card-plus">+</span>
+          <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;">
+            {% for product in group.list %}
+            <div class="pos-product-card" 
+                 data-name="{{ product.name|lower }}" 
+                 data-category="{{ product.category_id|default:'none' }}"
+                 hx-post="{% url 'cart_add' product.id %}" 
+                 hx-vals='{"quantity": 1}'
+                 hx-target="#live-receipt-container" 
+                 hx-swap="innerHTML"
+                 hx-indicator="#receipt-loader">
+                 
+              <div class="pos-card-img-wrap">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                  <div class="pos-card-placeholder">
+                    <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 60px; height: 60px; opacity: 0.2;">
+                  </div>
+                {% endif %}
+                <div class="pos-card-overlay">
+                   <span style="font-size: 1.5rem; color: white; font-weight: 700;">+</span>
+                </div>
+              </div>
+              
+              <div style="padding: 12px;">
+                <strong class="pos-card-title">{{ product.name }}</strong>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                  <span class="pos-card-price">UGX {{ product.price|intcomma }}</span>
+                  <span class="pos-card-plus">+</span>
+                </div>
+              </div>
             </div>
+            {% endfor %}
           </div>
+        </div>
+        {% empty %}
+        <div style="padding: 100px 20px; text-align: center; opacity: 0.4;">
+           <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
+           <p style="font-weight: 700; font-size: 1.2rem;">No products available</p>
+           <p>Add products in the inventory to see them here.</p>
         </div>
         {% endfor %}
       </div>
@@ -270,23 +295,35 @@
   (function () {
     const searchInput = document.getElementById("sale-product-search");
     const chips = document.querySelectorAll(".pos-cat-chip");
-    const cards = document.querySelectorAll(".pos-product-card");
+    const sections = document.querySelectorAll(".pos-category-section");
     
     let currentFilter = "all";
     let currentSearch = "";
 
     function updateVisibility() {
-      cards.forEach(card => {
-        const name = card.getAttribute("data-name");
-        const category = card.getAttribute("data-category");
-        
-        const matchesSearch = name.includes(currentSearch);
-        const matchesCategory = currentFilter === "all" || category === currentFilter;
-        
-        if (matchesSearch && matchesCategory) {
-          card.style.display = "flex";
+      sections.forEach(section => {
+        const sectionCategory = section.getAttribute("data-group-category");
+        const cards = section.querySelectorAll(".pos-product-card");
+        let visibleInRoot = 0;
+
+        cards.forEach(card => {
+          const name = card.getAttribute("data-name");
+          const matchesSearch = name.includes(currentSearch);
+          
+          if (matchesSearch) {
+            card.style.display = "flex";
+            visibleInRoot++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        // Section visibility logic
+        const categoryMatch = currentFilter === "all" || sectionCategory === currentFilter;
+        if (categoryMatch && visibleInRoot > 0) {
+          section.style.display = "block";
         } else {
-          card.style.display = "none";
+          section.style.display = "none";
         }
       });
     }
@@ -302,26 +339,19 @@
       chip.addEventListener("click", function() {
         chips.forEach(c => c.classList.remove("active"));
         this.classList.add("active");
-
+        
         currentFilter = this.getAttribute("data-filter");
-        if (currentFilter === "all") {
-          currentSearch = "";
-          if (searchInput) {
-            searchInput.value = "";
-          }
-        }
         updateVisibility();
       });
     });
 
-    // Success feedback on click
-    cards.forEach(card => {
-       card.addEventListener('click', () => {
+    // Success feedback on click delegation (better for dynamic content)
+    document.getElementById('product-selection-grid').addEventListener('click', (e) => {
+       const card = e.target.closest('.pos-product-card');
+       if (card) {
           card.classList.add('success-add');
           setTimeout(() => card.classList.remove('success-add'), 500);
-          
-          // Audio feedback if desired: new Audio('/static/sounds/beep.mp3').play();
-       });
+       }
     });
 
     // Config HTMX CSRF
