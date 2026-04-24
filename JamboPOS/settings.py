@@ -64,25 +64,36 @@ SECRET_KEY = "django-insecure--v6y&3mkd6u#to-$(^45vx+iw_7l3ag-k@(3+@jv!7r-_8nd32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-# Allow environment variable to set hosts, default to your domain
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "jambo-pos.tagooledavid.com,localhost,127.0.0.1").split(",")
+# Allow environment variable to set hosts, default to your domain and its wildcard
+ALLOWED_HOSTS = [
+    host.strip() 
+    for host in os.environ.get(
+        "ALLOWED_HOSTS", 
+        "jambo-pos.tagooledavid.com,.tagooledavid.com,localhost,127.0.0.1"
+    ).split(",") 
+    if host.strip()
+]
 
-# CSRF settings for production
+# CSRF settings for production - ensure no trailing slashes
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
+    origin.strip().rstrip("/")
     for origin in os.environ.get(
         "CSRF_TRUSTED_ORIGINS",
-        "https://jambo-pos.tagooledavid.com",
+        "https://jambo-pos.tagooledavid.com,http://jambo-pos.tagooledavid.com",
     ).split(",")
     if origin.strip()
 ]
 
-# Ensure we handle headers from reverse proxy correctly
+# Robust proxy handling
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
-# Common for Docker setups to avoid "Origin checking failed"
+USE_X_FORWARDED_PORT = True
+
+# Security headers - adjust based on your SSL setup
 CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "True").lower() == "true"
 SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() == "true"
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() == "true"
+
 
 
 # Application definition
