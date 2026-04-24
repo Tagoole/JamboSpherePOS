@@ -62,14 +62,12 @@ PWA_APP_LANG = 'en-US'
 SECRET_KEY = "django-insecure--v6y&3mkd6u#to-$(^45vx+iw_7l3ag-k@(3+@jv!7r-_8nd32"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = [
-    "jambo-pos.tagooledavid.com",
-    "localhost",
-    "127.0.0.1"
-]
+# Allow environment variable to set hosts, default to your domain
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "jambo-pos.tagooledavid.com,localhost,127.0.0.1").split(",")
 
+# CSRF settings for production
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
@@ -79,9 +77,12 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
-# Respect HTTPS when running behind a reverse proxy (for example Nginx Proxy Manager).
+# Ensure we handle headers from reverse proxy correctly
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
+# Common for Docker setups to avoid "Origin checking failed"
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "True").lower() == "true"
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() == "true"
 
 
 # Application definition
