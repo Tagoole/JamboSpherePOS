@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}Receipt #{{ sale.id }} | Jambo Sphere POS{% endblock %}
 
@@ -75,10 +75,10 @@
           <tr>
             <td style="padding: 8px 0;">
               <div>{{ item.product.name }}</div>
-              <div style="font-size: 0.75rem; color: #666;">@ UGX {{ item.unit_price }}</div>
+              <div style="font-size: 0.75rem; color: #666;">@ UGX {{ item.unit_price|intcomma }}</div>
             </td>
             <td style="text-align: center; padding: 8px 0;">{{ item.quantity }}</td>
-            <td style="text-align: right; padding: 8px 0;">UGX {{ item.subtotal }}</td>
+            <td style="text-align: right; padding: 8px 0;">UGX {{ item.subtotal|intcomma }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -87,17 +87,17 @@
       <div style="border-top: 1px dashed #ccc; padding-top: 15px; font-size: 1rem;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
           <span>Subtotal:</span>
-          <span>UGX {{ sale.subtotal }}</span>
+          <span>UGX {{ sale.subtotal|intcomma }}</span>
         </div>
         {% if sale.tax_rate > 0 %}
         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
           <span>Tax ({{ sale.tax_rate }}%):</span>
-          <span>UGX {{ sale.tax_amount }}</span>
+          <span>UGX {{ sale.tax_amount|intcomma }}</span>
         </div>
         {% endif %}
         <div style="display: flex; justify-content: space-between; margin-top: 10px; font-weight: bold; font-size: 1.2rem; border-top: 2px solid #333; padding-top: 10px;">
           <span>GRAND TOTAL:</span>
-          <span>UGX {{ sale.total_amount }}</span>
+          <span>UGX {{ sale.total_amount|intcomma }}</span>
         </div>
       </div>
 

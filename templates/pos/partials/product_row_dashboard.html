@@ -1,7 +1,8 @@
+{% load humanize %}
 {% for product in products %}
 <tr>
   <td style="font-weight: 500;">{{ product.name }}</td>
-  <td style="text-align: right; font-weight: 600;">UGX {{ product.price }}</td>
+  <td style="text-align: right; font-weight: 600;">UGX {{ product.price|intcomma }}</td>
 </tr>
 {% empty %}
 <tr>

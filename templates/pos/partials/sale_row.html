@@ -1,8 +1,9 @@
+{% load humanize %}
 {% for sale in sales %}
 <tr>
   <td>{{ sale.created_at_display }}</td>
   <td>#{{ sale.id }}</td>
-  <td>UGX {{ sale.total_amount }}</td>
+  <td>UGX {{ sale.total_amount|intcomma }}</td>
   <td>
     <div class="actions">
       <button class="btn-link" onclick="viewSaleDetails({{ sale.id }})">Details</button>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}Shopping Cart | Jambo Sphere POS{% endblock %}
 
@@ -44,7 +44,7 @@
                       <span style="font-weight: 600;">{{ product.name }}</span>
                     </div>
                   </td>
-                  <td>UGX {{ item.price }}</td>
+                  <td>UGX {{ item.price|intcomma }}</td>
                   <td>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(0,0,0,0.03); padding: 6px; border-radius: 12px; width: fit-content; margin: 0 auto;">
                       <form action="{% url 'cart_add' product.id %}" method="post" style="margin: 0;">
@@ -62,7 +62,7 @@
                       </form>
                     </div>
                   </td>
-                  <td style="font-weight: 700;">UGX {{ item.total_price }}</td>
+                  <td style="font-weight: 700;">UGX {{ item.total_price|intcomma }}</td>
                   <td style="padding-right: 0; text-align: right;">
                     <form action="{% url 'cart_remove' product.id %}" method="post" style="margin: 0;">
                       {% csrf_token %}
@@ -110,12 +110,12 @@
 
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; opacity: 0.7;">
               <span>Subtotal:</span>
-              <strong>UGX {{ cart.get_total_price }}</strong>
+              <strong>UGX {{ cart.get_total_price|intcomma }}</strong>
             </div>
             
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; padding-top: 15px;">
               <span style="font-weight: 700; text-transform: uppercase; font-size: 0.8rem; color: var(--ink-soft);">Gross Amount</span>
-              <strong id="final-total" style="font-size: 1.8rem; color: var(--brand);">UGX {{ cart.get_total_price }}</strong>
+              <strong id="final-total" style="font-size: 1.8rem; color: var(--brand);">UGX {{ cart.get_total_price|intcomma }}</strong>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 30px; padding: 18px; border-radius: 20px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(25, 180, 143, 0.3);" {% if not cart %}disabled{% endif %}>
