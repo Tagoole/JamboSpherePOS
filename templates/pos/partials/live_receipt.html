@@ -76,7 +76,7 @@
     </div>
 
     <!-- Rapid Checkout Action -->
-    <form action="{% url 'checkout' %}" method="POST" style="margin: 0;">
+    <form action="{% url 'checkout' %}" method="POST" style="margin: 0;" hx-boost="false" target="_top">
       {% csrf_token %}
       <input type="hidden" name="client_name" value="Walk-in Customer">
       <input type="hidden" name="tax_rate" value="0">
