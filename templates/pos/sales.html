@@ -302,8 +302,14 @@
       chip.addEventListener("click", function() {
         chips.forEach(c => c.classList.remove("active"));
         this.classList.add("active");
-        
+
         currentFilter = this.getAttribute("data-filter");
+        if (currentFilter === "all") {
+          currentSearch = "";
+          if (searchInput) {
+            searchInput.value = "";
+          }
+        }
         updateVisibility();
       });
     });
