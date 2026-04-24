@@ -249,14 +249,23 @@ def sales_page(request):
 @require_POST
 def category_create(request):
 	if not request.user.is_staff:
-		return HttpResponseBadRequest("Only admins can create categories.")
-	
+		from django.contrib import messages
+		messages.error(request, "Only admins can create categories.")
+		return redirect("products")
+
 	form = CategoryForm(request.POST)
 	if form.is_valid():
 		form.save()
+		from django.contrib import messages
+		messages.success(request, "Category created successfully.")
 		return redirect("products")
-	return HttpResponseBadRequest("Invalid category data.")
 
+	from django.contrib import messages
+	for field, errors in form.errors.items():
+		for error in errors:
+			messages.error(request, f"Error in {field}: {error}")
+
+	return redirect("products")
 
 @login_required(login_url="login")
 @require_GET
