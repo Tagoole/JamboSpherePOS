@@ -74,6 +74,10 @@ DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 #    if host.strip()
 #]
 ALLOWED_HOSTS = [
+    "jambo-pos.tagooledavid.com",
+    ".tagooledavid.com",
+    "localhost",
+    "127.0.0.1",
     "*"
 ]
 
