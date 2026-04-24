@@ -95,7 +95,7 @@ def _daily_summary_context(report_date) -> dict:
 		"avg_sale_value_today": _as_money(average_ticket),
 		"highest_sale_today": _as_money(highest_sale.total_amount) if highest_sale else "0.00",
 		"top_product_today": top_product["product__name"] if top_product else "N/A",
-		"recent_sales": _sales_rows(limit=8, report_date=report_date),
+		"recent_sales": _daily_sales_activity_rows(report_date=report_date, limit=8),
 		"products_sold_rows": products_sold_rows,
 		"selected_report_date": report_date.isoformat(),
 		"selected_report_date_label": report_date.strftime("%a, %B %d, %Y"),
@@ -172,21 +172,42 @@ def _analytics_context() -> dict:
 
 
 def _sales_rows(limit=None, report_date=None):
-	queryset = Sale.objects.all()
+	queryset = SaleItem.objects.select_related("product", "sale").all()
 	if report_date:
-		queryset = queryset.filter(sale_date__date=report_date)
+		queryset = queryset.filter(sale__sale_date__date=report_date)
 
-	queryset = queryset.order_by("-sale_date")
+	queryset = queryset.order_by("-sale__sale_date")
 	if limit:
 		queryset = queryset[:limit]
 
 	return [
 		{
-			"id": sale.id,
-			"created_at_display": timezone.localtime(sale.sale_date).strftime("%H:%M"),
-			"total_amount": _as_money(sale.total_amount),
+			"id": item.sale.id,
+			"created_at_display": timezone.localtime(item.sale.sale_date).strftime("%H:%M"),
+			"product_name": item.product.name,
+			"quantity": item.quantity,
+			"total_amount": _as_money(item.sale.total_amount),
 		}
-		for sale in queryset
+		for item in queryset
+	]
+
+
+def _daily_sales_activity_rows(report_date, limit=None):
+	queryset = SaleItem.objects.select_related("product", "sale").filter(
+		sale__sale_date__date=report_date
+	).order_by("-sale__sale_date")
+
+	if limit:
+		queryset = queryset[:limit]
+
+	return [
+		{
+			"created_at_display": timezone.localtime(item.sale.sale_date).strftime("%H:%M"),
+			"product_name": item.product.name,
+			"quantity": item.quantity,
+			"subtotal": _as_money(item.subtotal or (item.unit_price * item.quantity)),
+		}
+		for item in queryset
 	]
 
 
@@ -274,7 +295,7 @@ def notification_delete(request, notification_id: int):
 @require_GET
 def products_page(request):
 	context = {
-		"products": Product.objects.all(),
+		"products": Product.objects.select_related("category").all(),
 		"categories": Category.objects.all()
 	}
 	return render(request, "pos/products.html", context)
@@ -284,7 +305,7 @@ def products_page(request):
 @require_GET
 def sales_page(request):
 	context = {
-		"products": Product.objects.all(),
+		"products": Product.objects.select_related("category").all(),
 		"categories": Category.objects.all(),
 		"sales": _sales_rows(),
 		**_totals_context(),
@@ -304,6 +325,64 @@ def category_create(request):
 		form.save()
 		return redirect("products")
 	return HttpResponseBadRequest("Invalid category data.")
+
+
+@login_required(login_url="login")
+@require_GET
+def category_list(request):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can view categories.")
+	
+	categories = Category.objects.all()
+	return render(request, "pos/partials/category_list.html", {"categories": categories})
+
+
+@login_required(login_url="login")
+@require_GET
+def category_edit_page(request, category_id: int):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can edit categories.")
+	
+	category = get_object_or_404(Category, pk=category_id)
+	form = CategoryForm(instance=category)
+	return render(request, "pos/category_edit.html", {"form": form, "category": category})
+
+
+@login_required(login_url="login")
+@require_POST
+def category_update(request, category_id: int):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can update categories.")
+	
+	category = get_object_or_404(Category, pk=category_id)
+	form = CategoryForm(request.POST, instance=category)
+	
+	if not form.is_valid():
+		return HttpResponseBadRequest("Invalid category data.")
+	
+	form.save()
+	
+	if request.headers.get("HX-Request") == "true":
+		categories = Category.objects.all()
+		return render(request, "pos/partials/category_list.html", {"categories": categories})
+	
+	return redirect("products")
+
+
+@login_required(login_url="login")
+@require_POST
+def category_delete(request, category_id: int):
+	if not request.user.is_staff:
+		return HttpResponseBadRequest("Only admins can delete categories.")
+	
+	category = get_object_or_404(Category, pk=category_id)
+	category.delete()
+	
+	if request.headers.get("HX-Request") == "true":
+		categories = Category.objects.all()
+		return render(request, "pos/partials/category_list.html", {"categories": categories})
+	
+	return redirect("products")
 
 
 @login_required(login_url="login")
@@ -340,13 +419,13 @@ def partial_analytics_summary(request):
 @login_required(login_url="login")
 @require_GET
 def partial_products_list(request):
-	return render(request, "pos/partials/product_row.html", {"products": Product.objects.all()})
+	return render(request, "pos/partials/product_row.html", {"products": Product.objects.select_related("category").all()})
 
 
 @login_required(login_url="login")
 @require_GET
 def partial_recent_products_list(request):
-	return render(request, "pos/partials/product_row_dashboard.html", {"products": Product.objects.order_by("-created_at")[:5]})
+	return render(request, "pos/partials/product_row_dashboard.html", {"products": Product.objects.select_related("category").order_by("-created_at")[:5]})
 
 
 @login_required(login_url="login")

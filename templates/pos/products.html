@@ -27,6 +27,19 @@
             <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Create</button>
           </form>
         </section>
+
+        {% if categories %}
+        <section class="glass" style="padding: 24px;">
+          <h3 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">Categories</h3>
+          <div id="category-list" 
+               hx-get="{% url 'category-list' %}" 
+            hx-trigger="load, productsChanged from:body" 
+               hx-swap="innerHTML">
+            <!-- Loader -->
+            <div style="text-align: center; opacity: 0.5; padding: 20px;">Loading...</div>
+          </div>
+        </section>
+        {% endif %}
         {% endif %}
 
         <section class="glass" style="padding: 24px; border-top: 4px solid var(--accent);">

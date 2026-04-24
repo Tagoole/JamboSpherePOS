@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
@@ -55,9 +57,14 @@ class Sale(models.Model):
         
         
     def update_total(self):
-        total = self.items.aggregate(total=Sum("subtotal"))["total"] or 0
-        self.total_amount = total
-        self.save(update_fields=["total_amount"])
+        subtotal = self.items.aggregate(total=Sum("subtotal"))["total"] or Decimal("0.00")
+        tax_rate = self.tax_rate or Decimal("0.00")
+        tax_amount = (subtotal * (tax_rate / Decimal("100"))).quantize(Decimal("0.01"))
+        total_amount = subtotal + tax_amount
+        self.subtotal = subtotal
+        self.tax_amount = tax_amount
+        self.total_amount = total_amount
+        self.save(update_fields=["subtotal", "tax_amount", "total_amount"])
         
         
         
@@ -83,15 +90,15 @@ class SaleItem(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.unit_price or self.unit_price == 0:
-            self.unit_price = self.product.price # automatically set unit price from the product price
-            
-            #calculate the subtotal
-            self.subtotal = self.unit_price * self.quantity
-            
-            super().save(*args, **kwargs)
-            
-            if self.sale:
-                self.sale.update_total() # update the total amount of the sale whenever a sale item is saved or updated
+            self.unit_price = self.product.price  # auto-set unit price from the product price
+
+        # Always calculate subtotal from unit price and quantity
+        self.subtotal = self.unit_price * self.quantity
+
+        super().save(*args, **kwargs)
+
+        if self.sale:
+            self.sale.update_total()  # sync sale totals after item save
                 
     def __str__(self):
         return f"{self.quantity}x {self.product.name} @ UGX {self.unit_price:,}"

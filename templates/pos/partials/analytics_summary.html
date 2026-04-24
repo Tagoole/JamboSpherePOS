@@ -1,58 +1,58 @@
 <!-- KPIs Row -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
-  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(25, 180, 143, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
-    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Net Revenue</div>
-    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_total_revenue }}</div>
-    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Gross intake across history</div>
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(25, 180, 143, 0.1) 0%, rgba(255,255,255,0.6) 100%); border-left: 4px solid #19b48f;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #19b48f; margin-bottom: 8px;">💰 Total Money</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--ink); font-family: 'Space Grotesk';">{{ analytics_total_revenue }}</div>
+    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft);">Money earned so far</div>
   </article>
 
-  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(45, 212, 166, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
-    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Total Orders</div>
-    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_total_transactions }}</div>
-    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Total number of completed orders</div>
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(45, 212, 166, 0.1) 0%, rgba(255,255,255,0.6) 100%); border-left: 4px solid #2dd4a6;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #2dd4a6; margin-bottom: 8px;">📦 Total Sales</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--ink); font-family: 'Space Grotesk';">{{ analytics_total_transactions }}</div>
+    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft);">How many sales completed</div>
   </article>
 
-  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(140, 231, 208, 0.1) 0%, rgba(255,255,255,0.6) 100%);">
-    <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--ink-soft); margin-bottom: 8px;">Average Daily Sales</div>
-    <div style="font-size: 1.8rem; font-weight: 800; color: var(--brand); font-family: 'Space Grotesk';">{{ analytics_average_daily }}</div>
-    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--ink-soft);">Average sales amount per day</div>
+  <article class="glass" style="padding: 24px; background: linear-gradient(135deg, rgba(140, 231, 208, 0.1) 0%, rgba(255,255,255,0.6) 100%); border-left: 4px solid #21c45d;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #21c45d; margin-bottom: 8px;">📈 Average Per Day</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--ink); font-family: 'Space Grotesk';">{{ analytics_average_daily }}</div>
+    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft);">Average money per day</div>
   </article>
 </div>
 
 <!-- Charts Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 32px;">
-  <article class="glass" style="padding: 30px;">
-    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-      <span>📉</span> Revenue Velocity
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 32px;">
+  <article class="glass" style="padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; margin-bottom: 24px; color: var(--ink); font-weight: 700;">
+      Daily Sales
     </h3>
-    <div style="height: 300px; width: 100%;">
+    <div style="height: 280px; width: 100%; position: relative;">
       <canvas id="dailyTrendChart"></canvas>
     </div>
   </article>
 
-  <article class="glass" style="padding: 30px;">
-    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-      <span>🍕</span> Product Affinity
+  <article class="glass" style="padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; margin-bottom: 24px; color: var(--ink); font-weight: 700;">
+      Top Products
     </h3>
-    <div style="height: 300px; width: 100%;">
+    <div style="height: 280px; width: 100%; position: relative;">
       <canvas id="productMixChart"></canvas>
     </div>
   </article>
 
-  <article class="glass" style="padding: 30px;">
-    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-      <span>📅</span> Peak Operations
+  <article class="glass" style="padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; margin-bottom: 24px; color: var(--ink); font-weight: 700;">
+      Sales by Day of Week
     </h3>
-    <div style="height: 300px; width: 100%;">
+    <div style="height: 280px; width: 100%; position: relative;">
       <canvas id="weekdayChart"></canvas>
     </div>
   </article>
 
-  <article class="glass" style="padding: 30px;">
-    <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
-      <span>📊</span> Period Performance
+  <article class="glass" style="padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);">
+    <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; margin-bottom: 24px; color: var(--ink); font-weight: 700;">
+      Weekly Sales
     </h3>
-    <div style="height: 300px; width: 100%;">
+    <div style="height: 280px; width: 100%; position: relative;">
       <canvas id="weeklyComparisonChart"></canvas>
     </div>
   </article>
@@ -68,132 +68,3 @@
 {{ weekly_totals|json_script:"weekly-totals-data" }}
 {{ product_labels|json_script:"product-labels-data" }}
 {{ product_qty|json_script:"product-qty-data" }}
-
-<script>
-  (function () {
-    const parseData = (id) => JSON.parse(document.getElementById(id).textContent || "[]");
-    
-    const dailyLabels = parseData("daily-labels-data");
-    const dailyTotals = parseData("daily-totals-data");
-    const dailyTransactions = parseData("daily-transactions-data");
-    const weekdayLabels = parseData("weekday-labels-data");
-    const weekdayTotals = parseData("weekday-totals-data");
-    const weeklyLabels = parseData("weekly-labels-data");
-    const weeklyTotals = parseData("weekly-totals-data");
-    const productLabels = parseData("product-labels-data");
-    const productQty = parseData("product-qty-data");
-
-    // Chart Global Config
-    Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
-    Chart.defaults.color = "#5b7578";
-    
-    // Gradient Creator
-    const getGradient = (ctx, color) => {
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, color);
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        return gradient;
-    };
-
-    // 1. Daily Trend
-    const dailyCtx = document.getElementById("dailyTrendChart").getContext('2d');
-    new Chart(dailyCtx, {
-      type: "line",
-      data: {
-        labels: dailyLabels,
-        datasets: [{
-          label: "Revenue",
-          data: dailyTotals,
-          borderColor: "#19b48f",
-          backgroundColor: getGradient(dailyCtx, "rgba(25, 180, 143, 0.2)"),
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 4,
-          pointBackgroundColor: "#19b48f"
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { borderDash: [5, 5] }, ticks: { callback: v => 'UGX ' + v } }
-        }
-      }
-    });
-
-    // 2. Product Mix
-    new Chart(document.getElementById("productMixChart"), {
-      type: "doughnut",
-      data: {
-        labels: productLabels,
-        datasets: [{
-          data: productQty,
-          backgroundColor: ["#19b48f", "#2dd4a6", "#8ce7d0", "#21c45d", "#158b6e", "#10634e"],
-          borderWidth: 0,
-          hoverOffset: 20
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '75%',
-        plugins: { 
-            legend: { position: 'right', labels: { usePointStyle: true, padding: 20 } }
-        }
-      }
-    });
-
-    // 3. Peak Operations (Bar)
-    new Chart(document.getElementById("weekdayChart"), {
-      type: "bar",
-      data: {
-        labels: weekdayLabels,
-        datasets: [{
-          label: "Throughput",
-          data: weekdayTotals,
-          backgroundColor: "rgba(25, 180, 143, 0.8)",
-          borderRadius: 12,
-          maxBarThickness: 40
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { display: false }, ticks: { display: false } }
-        }
-      }
-    });
-
-    // 4. Weekly Comparison
-    new Chart(document.getElementById("weeklyComparisonChart"), {
-      type: "bar",
-      data: {
-        labels: weeklyLabels,
-        datasets: [{
-          label: "Volume",
-          data: weeklyTotals,
-          borderWidth: 2,
-          borderColor: "#19b48f",
-          backgroundColor: "rgba(25, 180, 143, 0.1)",
-          borderRadius: 12,
-          maxBarThickness: 40
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { display: false } }
-        }
-      }
-    });
-  })();
-</script>

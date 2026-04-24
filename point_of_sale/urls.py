@@ -34,6 +34,10 @@ urlpatterns = [
 
 	# Categories
 	path("categories/add/", views.category_create, name="category-create"),
+	path("categories/", views.category_list, name="category-list"),
+	path("categories/<int:category_id>/edit/", views.category_edit_page, name="category-edit-page"),
+	path("categories/<int:category_id>/update/", views.category_update, name="category-update"),
+	path("categories/<int:category_id>/delete/", views.category_delete, name="category-delete"),
 
 	# Cart
 	path("cart/", views.cart_detail, name="cart_detail"),

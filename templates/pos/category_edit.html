@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Category | Jambo Sphere POS{% endblock %}
+
+{% block content %}
+<div class="shell">
+  {% include "pos/partials/sidebar.html" %}
+
+  <main class="main">
+    <header class="page-header" style="margin-bottom: 32px;">
+      <div>
+        <h1 style="font-size: 2rem;">Edit Category</h1>
+        <p>Update category information</p>
+      </div>
+    </header>
+
+    <div style="max-width: 600px;">
+      <section class="glass" style="padding: 30px;">
+        <form method="post" action="{% url 'category-update' category.id %}">
+          {% csrf_token %}
+          
+          <div class="field">
+            <label for="id_name">Category Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <div style="color: var(--danger); font-size: 0.9rem; margin-top: 8px;">
+                {{ form.name.errors }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button class="btn btn-primary" type="submit">Update Category</button>
+            <a href="{% url 'products' %}" class="btn" style="background: #f1f5f9; color: var(--ink);">Cancel</a>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+{% endblock %}
