@@ -64,7 +64,7 @@ SECRET_KEY = "django-insecure--v6y&3mkd6u#to-$(^45vx+iw_7l3ag-k@(3+@jv!7r-_8nd32
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = ["jambo-pos.tagooledavid.com"]
+ALLOWED_HOSTS = ["pos.tagooledavid.com"]
 
 # CSRF settings for production - ensure no trailing slashes
 CSRF_TRUSTED_ORIGINS = [
