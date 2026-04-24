@@ -65,13 +65,16 @@ SECRET_KEY = "django-insecure--v6y&3mkd6u#to-$(^45vx+iw_7l3ag-k@(3+@jv!7r-_8nd32
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 # Allow environment variable to set hosts, default to your domain and its wildcard
+#ALLOWED_HOSTS = [
+#    host.strip() 
+#    for host in os.environ.get(
+#        "ALLOWED_HOSTS", 
+#        "jambo-pos.tagooledavid.com,.tagooledavid.com,localhost,127.0.0.1"
+#    ).split(",") 
+#    if host.strip()
+#]
 ALLOWED_HOSTS = [
-    host.strip() 
-    for host in os.environ.get(
-        "ALLOWED_HOSTS", 
-        "jambo-pos.tagooledavid.com,.tagooledavid.com,localhost,127.0.0.1"
-    ).split(",") 
-    if host.strip()
+    "*"
 ]
 
 # CSRF settings for production - ensure no trailing slashes

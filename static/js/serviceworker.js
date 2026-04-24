@@ -1,12 +1,11 @@
-const STATIC_CACHE = 'jambopos-static-v5';
-const DYNAMIC_CACHE = 'jambopos-dynamic-v5';
+const STATIC_CACHE = 'jambopos-static-v6';
+const DYNAMIC_CACHE = 'jambopos-dynamic-v6';
 
 const APP_SHELL = [
   '/',
   '/dashboard/',
   '/products/',
   '/sales/',
-  '/analytics/',
   '/reports/daily/',
   '/static/js/offline-sync.js',
 ];
@@ -57,10 +56,13 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(
       fetch(event.request)
         .then(function (response) {
-          const responseClone = response.clone();
-          caches.open(STATIC_CACHE).then(function (cache) {
-            cache.put(event.request, responseClone);
-          });
+          // Only cache successful responses
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE).then(function (cache) {
+              cache.put(event.request, responseClone);
+            });
+          }
           return response;
         })
         .catch(function () {
@@ -83,10 +85,13 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(
       fetch(event.request)
         .then(function (response) {
-          const responseClone = response.clone();
-          caches.open(DYNAMIC_CACHE).then(function (cache) {
-            cache.put(event.request, responseClone);
-          });
+          // Only cache successful responses
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(DYNAMIC_CACHE).then(function (cache) {
+              cache.put(event.request, responseClone);
+            });
+          }
           return response;
         })
         .catch(function () {
