@@ -33,12 +33,17 @@ class Cart:
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         cart = copy.deepcopy(self.cart)
+        
+        # Keep track of valid items
+        valid_items = []
         for product in products:
-            cart[str(product.id)]['product'] = product
-
-        for item in cart.values():
+            item = cart[str(product.id)]
+            item['product'] = product
             item['price'] = float(item['price'])
             item['total_price'] = item['price'] * item['quantity']
+            valid_items.append(item)
+            
+        for item in valid_items:
             yield item
 
     def __len__(self):

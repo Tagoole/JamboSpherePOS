@@ -55,7 +55,9 @@
             {% if product.image %}
               <img src="{{ product.image.url }}" alt="{{ product.name }}">
             {% else %}
-              <div class="pos-card-placeholder">🍽️</div>
+              <div class="pos-card-placeholder">
+                <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 60px; height: 60px; opacity: 0.2;">
+              </div>
             {% endif %}
             <div class="pos-card-overlay">
                <span style="font-size: 1.5rem; color: white; font-weight: 700;">+</span>

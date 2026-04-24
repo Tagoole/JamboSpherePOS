@@ -3,11 +3,11 @@
 <tr style="border-bottom: 1px solid #f1f5f9;">
   <td style="padding: 20px 30px;">
     <div style="display: flex; align-items: center; gap: 16px;">
-      <div style="width: 50px; height: 50px; border-radius: 12px; overflow: hidden; background: #f8fafc; border: 1px solid #f1f5f9; flex-shrink: 0;">
+      <div style="width: 50px; height: 50px; border-radius: 12px; overflow: hidden; background: #f8fafc; border: 1px solid #f1f5f9; flex-shrink: 0; display: grid; place-items: center;">
         {% if product.image %}
           <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
         {% else %}
-          <div style="width: 100%; height: 100%; display: grid; place-items: center; font-size: 1.2rem; background: #f1f5f9; color: #cbd5e1;">📦</div>
+          <img src="{% static 'images/icon-160x160.png' %}" alt="{{ product.name }}" style="width: 30px; height: 30px; opacity: 0.3;">
         {% endif %}
       </div>
       <div>
